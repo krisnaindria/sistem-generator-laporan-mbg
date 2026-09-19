@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#ecfdf5"/>
+  <rect x="32" y="32" width="736" height="536" rx="28" fill="none" stroke="#047857" stroke-width="8" stroke-dasharray="18 14"/>
+  <circle cx="400" cy="240" r="72" fill="#d1fae5"/>
+  <path d="M360 245h80M400 205v80" stroke="#047857" stroke-width="14" stroke-linecap="round"/>
+  <text x="400" y="360" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#064e3b">UNGGAH FOTO PELAKSANAAN</text>
+  <text x="400" y="410" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" fill="#6b7280">Klik area ini untuk memilih dokumentasi</text>
+</svg>
