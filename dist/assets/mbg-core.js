@@ -160,6 +160,45 @@
             : { data: primary, source: 'primary' };
     }
 
+
+
+    function createEmptyDistributionState() {
+        return {
+            pagi: { time: '09.00', rows: [] },
+            siang: { time: '11.00', rows: [] },
+            b3: { time: '09.00', rows: [] },
+            sourceRaw: ''
+        };
+    }
+
+    function normalizeDistributionState(value, fallbackValue = null) {
+        const isRecord = candidate => candidate && typeof candidate === 'object' && !Array.isArray(candidate);
+        const hasDistributionSection = candidate => isRecord(candidate)
+            && ['pagi', 'siang', 'morning', 'afternoon', 'b3'].some(key => Object.prototype.hasOwnProperty.call(candidate, key));
+        const source = hasDistributionSection(value)
+            ? value
+            : (hasDistributionSection(fallbackValue) ? fallbackValue : createEmptyDistributionState());
+        const cloneRows = rows => Array.isArray(rows)
+            ? rows.filter(isRecord).map(row => ({ ...row }))
+            : [];
+        const normalizeSection = (primaryKey, legacyKey, defaultTime) => {
+            const section = source[primaryKey] ?? (legacyKey ? source[legacyKey] : undefined);
+            if (Array.isArray(section)) return { time: defaultTime, rows: cloneRows(section) };
+            if (!isRecord(section)) return { time: defaultTime, rows: [] };
+            return {
+                time: String(section.time || defaultTime),
+                rows: cloneRows(section.rows)
+            };
+        };
+
+        return {
+            pagi: normalizeSection('pagi', 'morning', '09.00'),
+            siang: normalizeSection('siang', 'afternoon', '11.00'),
+            b3: normalizeSection('b3', null, '09.00'),
+            sourceRaw: String(source.sourceRaw || '')
+        };
+    }
+
     return {
         escapeHtml,
         parseMenuItems,
@@ -174,6 +213,8 @@
         safeFilename,
         validateIdentity,
         buildAutosaveCheckpoint,
-        recoverSavedData
+        recoverSavedData,
+        createEmptyDistributionState,
+        normalizeDistributionState
     };
 });
