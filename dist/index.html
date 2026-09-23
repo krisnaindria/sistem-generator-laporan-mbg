@@ -3022,7 +3022,7 @@
                 updatedAt: new Date().toISOString(),
                 distVal: '', wasteVal: '', menuVal: '', kedatanganVal: '', readyVal: '', logisticsVal: '', fruitVal: '',
                 wasteMode: unitId === 'sppg2' ? 'communal' : 'detail',
-                structuredInputs: { menu: { rows: [], sourceRaw: '' }, fruit: { name: '', arrival: '', ready: '', condition: '', taste: '', sourceRaw: '' }, distribution: { morning: [], afternoon: [], b3: [], sourceRaw: '' }, modes: { menu: 'builder', fruit: 'builder', distribution: 'builder' } },
+                structuredInputs: { menu: { rows: [], sourceRaw: '' }, fruit: { name: '', arrival: '', ready: '', condition: '', taste: '', sourceRaw: '' }, distribution: window.MBGCore.createEmptyDistributionState(), modes: { menu: 'builder', fruit: 'builder', distribution: 'builder' } },
                 referenceConfirmations: {},
                 tanggalVal: window.formatDateToIndonesian(dateObj),
                 theme: 'auto',
@@ -3885,7 +3885,7 @@
         };
 
         window.emptyDistributionState = function() {
-            return { pagi: { time: '09.00', rows: [] }, siang: { time: '11.00', rows: [] }, b3: { time: '09.00', rows: [] }, sourceRaw: '' };
+            return window.MBGCore.createEmptyDistributionState();
         };
 
         window.parseDistributionQuickText = function(text) {
@@ -3926,7 +3926,7 @@
         };
 
         window.serializeDistributionData = function(state) {
-            const value = state || window.emptyDistributionState();
+            const value = window.MBGCore.normalizeDistributionState(state);
             const lines = [];
             const schoolSection = (key, title, relation) => {
                 lines.push(`${title} (${relation} ${value[key].time || (key === 'pagi' ? '09.00' : '11.00')} WIB)`);
@@ -3943,7 +3943,8 @@
         window.renderDistributionBuilder = function() {
             const container = document.getElementById('distributionBuilderPanel');
             if (!container) return;
-            const state = window.structuredInputState.distribution || window.emptyDistributionState();
+            const state = window.MBGCore.normalizeDistributionState(window.structuredInputState.distribution);
+            window.structuredInputState.distribution = state;
             const e = window.escapeReportHtml;
             const configs = [
                 { key: 'pagi', title: 'Pengiriman Pagi', fields: [['kecil','Porsi Kecil'],['besar','Porsi Besar']] },
@@ -4051,7 +4052,8 @@
             const menu = document.getElementById('inputMenu');
             window.structuredInputState.menu = savedData?.structuredInputs?.menu || window.parseMenuQuickText(menu?.value || '');
             window.structuredInputState.fruit = savedData?.structuredInputs?.fruit || window.parseFruitQuickText(fruit?.value || '');
-            window.structuredInputState.distribution = savedData?.structuredInputs?.distribution || window.parseDistributionQuickText(distribution?.value || '');
+            const parsedDistribution = window.parseDistributionQuickText(distribution?.value || '');
+            window.structuredInputState.distribution = window.MBGCore.normalizeDistributionState(savedData?.structuredInputs?.distribution, parsedDistribution);
             window.structuredInputState.modes = { menu: 'builder', fruit: 'builder', distribution: 'builder', ...(savedData?.structuredInputs?.modes || {}) };
             if (menu) menu.value = window.serializeMenuData(window.structuredInputState.menu);
             if (fruit) fruit.value = window.serializeFruitData(window.structuredInputState.fruit);
