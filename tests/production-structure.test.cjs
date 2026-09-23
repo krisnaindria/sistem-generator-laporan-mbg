@@ -246,8 +246,9 @@ test('V8.1 menormalkan struktur distribusi saat membuat dan membuka laporan', ()
 test('validasi sisa makanan mencocokkan alias institusi secara aman', () => {
     assert.match(coreSource, /function normalizeInstitutionIdentity\(name\)/);
     assert.match(coreSource, /function institutionsMatch\(leftName, rightName\)/);
-    assert.match(html, /window\.MBGCore\.institutionsMatch\(name, item\.name\)/);
-    assert.equal((html.match(/window\.MBGCore\.institutionsMatch\(sw\.name, sd\.name\)/g) || []).length, 2);
+    assert.match(coreSource, /function findInstitutionMatch\(name, candidates, peers = null\)/);
+    assert.match(html, /window\.MBGCore\.findInstitutionMatch\(item\.name, b3WasteList, b3DistList\)/);
+    assert.equal((html.match(/window\.MBGCore\.findInstitutionMatch\(sw\.name, schoolDistList, schoolWasteList\)/g) || []).length, 2);
 });
 
 test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
