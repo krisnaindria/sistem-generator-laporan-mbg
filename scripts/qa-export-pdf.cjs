@@ -52,8 +52,8 @@ const fs = require('node:fs');
       '<span class="pdf-badge bg-purple-600 text-white">TERTINGGI</span>',
       '<span class="pdf-badge bg-blue-600 text-white">KONSUMSI BAIK</span>',
       '<span class="pdf-badge bg-emerald-800 text-white">HABIS 100% (ZERO WASTE)</span>',
-      '<span class="report-badge report-badge-compact bg-emerald-200 text-emerald-950 px-2 rounded"><i class="fa-solid fa-circle-check"></i> QC Passed</span>',
-      '<span class="report-badge report-badge-header bg-purple-600 text-white px-3 rounded-lg"><i class="fa-solid fa-lock"></i><span>23 SEPTEMBER 2026</span></span>'
+      '<span class="report-badge report-badge-compact text-[8px] bg-emerald-200 text-emerald-950 px-2 rounded"><i class="fa-solid fa-circle-check"></i> QC Passed</span>',
+      '<span class="report-badge report-badge-header text-[9px] bg-purple-600 text-white px-3 rounded-lg gap-1"><i class="fa-solid fa-lock"></i><span>23 SEPTEMBER 2026</span></span>'
     ].join('');
     document.getElementById('page-1').appendChild(qaPanel);
   });
