@@ -40,6 +40,19 @@ test('normalizeName menyamakan variasi identitas sekolah', () => {
     assert.equal(core.normalizeName('SDN SKM 003'), 'sukamaju3');
 });
 
+test('pencocokan institusi mengenali variasi penulisan PY dan Posyandu', () => {
+    assert.equal(core.institutionsMatch('POSYANDU ANGGREK (RW 05)', 'PY.Anggrek'), true);
+    assert.equal(core.institutionsMatch('POSYANDU BOUGENVILLE (RW 14)', 'PY. Bougenville'), true);
+    assert.equal(core.institutionsMatch('Pos Alamanda RW 24', 'Posyandu Alamanda'), true);
+});
+
+test('pencocokan institusi mempertahankan RW dan nomor pos sebagai pembeda', () => {
+    assert.equal(core.institutionsMatch('Pos Anggrek (RW 05)', 'Pos Anggrek (RW 06)'), false);
+    assert.equal(core.institutionsMatch('Pos Anggrek 1', 'Pos Anggrek 2'), false);
+    assert.equal(core.institutionsMatch('SDN Sukamaju 1', 'SDN SKM 01 (246+299)'), true);
+    assert.equal(core.institutionsMatch('Pos Mawar (Yonif 328)', 'Pos Mawar'), false);
+});
+
 test('klasifikasi sekolah membedakan B3 dan sekolah', () => {
     assert.equal(core.isSchoolInstitution('SMPN 6 Depok'), true);
     assert.equal(core.isSchoolInstitution('PAUD Dahlia'), true);

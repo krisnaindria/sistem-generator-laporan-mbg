@@ -242,3 +242,10 @@ test('V8.1 menormalkan struktur distribusi saat membuat dan membuka laporan', ()
     assert.match(html, /window\.MBGCore\.normalizeDistributionState\(savedData\?\.structuredInputs\?\.distribution, parsedDistribution\)/);
     assert.doesNotMatch(html, /distribution: \{ morning: \[\], afternoon: \[\], b3: \[\]/);
 });
+
+test('validasi sisa makanan mencocokkan alias institusi secara aman', () => {
+    assert.match(coreSource, /function normalizeInstitutionIdentity\(name\)/);
+    assert.match(coreSource, /function institutionsMatch\(leftName, rightName\)/);
+    assert.match(html, /window\.MBGCore\.institutionsMatch\(name, item\.name\)/);
+    assert.equal((html.match(/window\.MBGCore\.institutionsMatch\(sw\.name, sd\.name\)/g) || []).length, 2);
+});

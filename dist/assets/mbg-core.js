@@ -87,6 +87,29 @@
             .replace(/[^a-z0-9]/g, '');
     }
 
+    function normalizeInstitutionIdentity(name) {
+        const source = String(name || '').toLowerCase().replace(/[\u00A0\u200B\uFEFF]/g, ' ').trim();
+        const rwMatch = source.match(/\brw[\s.\-:/]*0*(\d+)\b/i);
+        const withoutAliases = source
+            .replace(/^\s*(?:py|posyandu|pos)\s*[.\-:]?\s*/i, '')
+            .replace(/\(\s*(?:rw[\s.\-:/]*0*\d+|\d+(?:\s*\+\s*\d+)*)\s*\)/gi, ' ')
+            .replace(/\brw[\s.\-:/]*0*\d+\b/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        return {
+            key: normalizeName(withoutAliases),
+            rw: rwMatch ? String(Number(rwMatch[1])) : ''
+        };
+    }
+
+    function institutionsMatch(leftName, rightName) {
+        const left = normalizeInstitutionIdentity(leftName);
+        const right = normalizeInstitutionIdentity(rightName);
+        if (!left.key || !right.key || left.key !== right.key) return false;
+        if (left.rw && right.rw) return left.rw === right.rw;
+        return true;
+    }
+
     function isSchoolInstitution(rawName) {
         const value = String(rawName || '').trim().toLowerCase();
         if (/(posyandu|pos\s+(anggrek|bougenville|alamanda|kamboja|anyelir|kenanga|melati|mawar)|py\.?|balita|bumil|busui|ibu hamil|ibu menyusui)/i.test(value)) return false;
@@ -207,6 +230,8 @@
         classifyIngredientCategory,
         stripEmbeddedDateHeaders,
         normalizeName,
+        normalizeInstitutionIdentity,
+        institutionsMatch,
         isSchoolInstitution,
         analysisHash,
         pickAnalysisVariant,
