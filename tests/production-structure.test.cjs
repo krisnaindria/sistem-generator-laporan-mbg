@@ -234,3 +234,11 @@ test('ringkasan porsi menampilkan kecil lalu besar pada baris terpisah', () => {
     assert.equal((html.match(/distribution-summary-value/g) || []).length >= 6, true);
     assert.doesNotMatch(html, /cardPorsiBesarKecilTitle[^>]*leading-tight/);
 });
+
+test('V8.1 menormalkan struktur distribusi saat membuat dan membuka laporan', () => {
+    assert.match(coreSource, /function createEmptyDistributionState\(\)/);
+    assert.match(coreSource, /function normalizeDistributionState\(value, fallbackValue = null\)/);
+    assert.match(html, /distribution: window\.MBGCore\.createEmptyDistributionState\(\)/);
+    assert.match(html, /window\.MBGCore\.normalizeDistributionState\(savedData\?\.structuredInputs\?\.distribution, parsedDistribution\)/);
+    assert.doesNotMatch(html, /distribution: \{ morning: \[\], afternoon: \[\], b3: \[\]/);
+});
