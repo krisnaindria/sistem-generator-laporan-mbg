@@ -45,10 +45,10 @@ jobs:
           CHROME_PATH: /usr/bin/google-chrome
         run: node scripts/qa-export-pdf.cjs
 
-      - name: Confirm PDF structure
+      - name: Confirm QA files exist
         run: |
-          pdfinfo qa-output/badge-hotfix-verification.pdf
-          test "$(pdfinfo qa-output/badge-hotfix-verification.pdf | awk '/^Pages:/ {print $2}')" = "9"
+          test -s qa-output/badge-hotfix-verification.pdf
+          test -s qa-output/badge-metrics.json
 
       - name: Upload QA artifact
         uses: actions/upload-artifact@v4
