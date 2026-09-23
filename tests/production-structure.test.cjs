@@ -28,9 +28,9 @@ test('autosave berkala membuat checkpoint setiap 30 detik dan saat halaman ditut
 });
 
 test('versi dan modul domain produksi termuat', () => {
-    assert.equal(packageJson.version, '8.1.5');
-    assert.match(html, /VERSI 8\.1\.5/);
-    assert.match(html, /version: '8\.1\.5'/);
+    assert.equal(packageJson.version, '8.1.6');
+    assert.match(html, /VERSI 8\.1\.6/);
+    assert.match(html, /version: '8\.1\.6'/);
     assert.match(html, /assets\/mbg-core\.js/);
     assert.match(html, /assets\/mbg-archive\.js/);
 });
@@ -257,13 +257,16 @@ test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
     assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?display: inline-flex !important;[\s\S]*?align-items: center !important;[\s\S]*?justify-content: center !important;/);
     assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?line-height: 1\.25 !important;[\s\S]*?font-weight: 800 !important;/);
     assert.match(html, /\.pdf-badge \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 2px 8px !important;/);
-    assert.doesNotMatch(html, /\.pdf-badge \{[\s\S]*?display: inline-block/);
+    assert.match(html, /body\.export-capture \.pdf-badge \{[\s\S]*?display: inline-block !important;[\s\S]*?height: 16px !important;[\s\S]*?line-height: 16px !important;/);
+    assert.match(html, /body\.export-capture \.report-badge-compact \{[\s\S]*?display: inline-block !important;[\s\S]*?height: 16px !important;[\s\S]*?line-height: 16px !important;/);
     assert.doesNotMatch(html, /py-0\.2/);
     assert.equal((html.match(/report-badge-header/g) || []).length >= 9, true);
     assert.match(html, /badgeEl\.className = `report-badge report-badge-compact/);
 });
 
 test('teks ringkas laporan menyediakan ruang vertikal saat diraster', () => {
-    assert.match(html, /\.report-safe-truncate \{[\s\S]*?min-height: 1\.4em !important;[\s\S]*?line-height: 1\.4 !important;[\s\S]*?padding-bottom: 1px !important;/);
+    assert.match(html, /\.report-safe-truncate \{[\s\S]*?min-height: 1\.65em !important;[\s\S]*?line-height: 1\.45 !important;[\s\S]*?padding-bottom: 2px !important;/);
+    assert.match(html, /body\.export-capture \.report-safe-truncate \{[\s\S]*?min-height: 1\.85em !important;[\s\S]*?line-height: 1\.5 !important;[\s\S]*?padding-bottom: 3px !important;/);
+    assert.doesNotMatch(html, /class="[^"]*\breport-safe-truncate\b[^"]*\struncate(?:\s|")/);
     assert.equal((html.match(/report-safe-truncate/g) || []).length >= 5, true);
 });
