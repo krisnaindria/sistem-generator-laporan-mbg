@@ -151,9 +151,11 @@
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
             vertical-align: middle !important;
             text-align: center !important;
-            line-height: 1.25 !important;
+            line-height: 1 !important;
             font-weight: 800 !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
@@ -161,23 +163,29 @@
         }
 
         .report-badge-compact {
-            min-height: 15px !important;
+            min-height: 16px !important;
             padding-top: 2px !important;
-            padding-bottom: 2px !important;
+            padding-bottom: 3px !important;
         }
 
         .report-badge-header {
             min-height: 24px !important;
             padding-top: 4px !important;
-            padding-bottom: 4px !important;
+            padding-bottom: 5px !important;
         }
 
         .pdf-badge {
             min-height: 16px !important;
-            padding: 2px 8px !important;
+            padding: 2px 8px 3px 8px !important;
             border-radius: 6px !important;
             font-size: 8px !important;
             text-transform: uppercase !important;
+        }
+
+        .report-badge i {
+            display: inline-block !important;
+            flex: 0 0 auto !important;
+            line-height: 1 !important;
         }
 
         .report-safe-truncate {
@@ -191,39 +199,6 @@
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
-        }
-
-        /*
-         * html2canvas menghitung baseline inline-flex berbeda dari Chromium.
-         * Saat ekspor, gunakan tinggi dan line-height deterministik agar teks
-         * badge tidak turun melewati bidang warna atau terpotong oleh tabel.
-         */
-        body.export-capture .pdf-badge {
-            display: inline-block !important;
-            height: 16px !important;
-            min-height: 16px !important;
-            padding: 0 8px !important;
-            line-height: 16px !important;
-            vertical-align: top !important;
-            overflow: visible !important;
-        }
-
-        body.export-capture .report-badge-compact {
-            display: inline-block !important;
-            height: 16px !important;
-            min-height: 16px !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            line-height: 16px !important;
-            vertical-align: top !important;
-            overflow: visible !important;
-        }
-
-        body.export-capture .report-badge-compact i {
-            display: inline-block !important;
-            line-height: 16px !important;
-            vertical-align: top !important;
-            margin-right: 3px !important;
         }
 
         body.export-capture .report-safe-truncate {
@@ -6120,9 +6095,18 @@
             const imgs = Array.from(element.querySelectorAll('img'));
             await Promise.all(imgs.map(async img => {
                 if (!img.complete) {
-                    await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+                    await new Promise(resolve => {
+                        const finish = () => {
+                            img.removeEventListener('load', finish);
+                            img.removeEventListener('error', finish);
+                            resolve();
+                        };
+                        img.addEventListener('load', finish, { once: true });
+                        img.addEventListener('error', finish, { once: true });
+                        if (img.complete) finish();
+                    });
                 }
-                if (img.decode) {
+                if (typeof img.decode === 'function') {
                     try { await img.decode(); } catch (e) {}
                 }
             }));
@@ -6157,28 +6141,41 @@
                     compress: true
                 });
 
-                const pages = document.querySelectorAll('.a4-page');
+                const pages = Array.from(document.querySelectorAll('.a4-page'));
+                if (pages.length !== 9) {
+                    throw new Error(`Jumlah halaman laporan tidak sesuai: ${pages.length} dari 9 halaman.`);
+                }
+                let renderedPagesCount = 0;
                 for (let i = 0; i < pages.length; i++) {
                     const page = pages[i];
-                    if (i > 0) pdf.addPage();
                     await ensureImagesLoaded(page);
 
                     const canvas = await html2canvas(page, {
                         scale: 2.0,
                         useCORS: true,
                         logging: false,
-                        allowTaint: true,
+                        allowTaint: false,
                         backgroundColor: '#ffffff',
                         imageTimeout: 15000,
                         ignoreElements: element => element.classList && element.classList.contains('no-print')
                     });
 
+                    if (canvas.width <= 0 || canvas.height <= 0) {
+                        throw new Error(`Halaman ${i + 1} gagal dirender ke kanvas.`);
+                    }
+
                     const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    if (renderedPagesCount > 0) pdf.addPage();
                     pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+                    renderedPagesCount++;
 
                     // Bersihkan objek kanvas secara eksplisit
                     canvas.width = 0;
                     canvas.height = 0;
+                }
+
+                if (renderedPagesCount !== 9) {
+                    throw new Error(`PDF hanya berhasil merender ${renderedPagesCount} dari 9 halaman.`);
                 }
 
                 const sppgData = SPPG_DATABASE[window.currentSppgKey] || SPPG_DATABASE.sppg1;

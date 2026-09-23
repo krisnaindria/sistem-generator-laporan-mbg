@@ -255,13 +255,29 @@ test('validasi sisa makanan mencocokkan alias institusi secara aman', () => {
 
 test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
     assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?display: inline-flex !important;[\s\S]*?align-items: center !important;[\s\S]*?justify-content: center !important;/);
-    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?line-height: 1\.25 !important;[\s\S]*?font-weight: 800 !important;/);
-    assert.match(html, /\.pdf-badge \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 2px 8px !important;/);
-    assert.match(html, /body\.export-capture \.pdf-badge \{[\s\S]*?display: inline-block !important;[\s\S]*?height: 16px !important;[\s\S]*?line-height: 16px !important;/);
-    assert.match(html, /body\.export-capture \.report-badge-compact \{[\s\S]*?display: inline-block !important;[\s\S]*?height: 16px !important;[\s\S]*?line-height: 16px !important;/);
+    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?height: auto !important;[\s\S]*?line-height: 1 !important;[\s\S]*?font-weight: 800 !important;/);
+    assert.match(html, /\.report-badge-compact \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding-top: 2px !important;[\s\S]*?padding-bottom: 3px !important;/);
+    assert.match(html, /\.report-badge-header \{[\s\S]*?min-height: 24px !important;[\s\S]*?padding-top: 4px !important;[\s\S]*?padding-bottom: 5px !important;/);
+    assert.match(html, /\.pdf-badge \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 2px 8px 3px 8px !important;/);
+    assert.match(html, /\.report-badge i \{[\s\S]*?flex: 0 0 auto !important;[\s\S]*?line-height: 1 !important;/);
+    assert.doesNotMatch(html, /body\.export-capture \.pdf-badge/);
+    assert.doesNotMatch(html, /body\.export-capture \.report-badge-compact/);
+    assert.doesNotMatch(html, /line-height: 16px !important/);
     assert.doesNotMatch(html, /py-0\.2/);
     assert.equal((html.match(/report-badge-header/g) || []).length >= 9, true);
     assert.match(html, /badgeEl\.className = `report-badge report-badge-compact/);
+});
+
+test('ekspor PDF mempertahankan validasi dan merender tepat sembilan halaman dengan aman', () => {
+    assert.match(html, /window\.syncData\(\);\s*if \(!window\.confirmValidationBeforeExport\(\)\) return;/);
+    assert.match(html, /img\.addEventListener\('load', finish, \{ once: true \}\)/);
+    assert.match(html, /img\.addEventListener\('error', finish, \{ once: true \}\)/);
+    assert.match(html, /typeof img\.decode === 'function'/);
+    assert.match(html, /const pages = Array\.from\(document\.querySelectorAll\('\.a4-page'\)\);/);
+    assert.match(html, /if \(pages\.length !== 9\)/);
+    assert.match(html, /allowTaint: false/);
+    assert.match(html, /canvas\.width <= 0 \|\| canvas\.height <= 0/);
+    assert.match(html, /if \(renderedPagesCount !== 9\)/);
 });
 
 test('teks ringkas laporan menyediakan ruang vertikal saat diraster', () => {
