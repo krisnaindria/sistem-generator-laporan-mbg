@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Generator Laporan Harian MBG - Versi 8.1.6</title>
+    <title>Sistem Generator Laporan Harian MBG - Versi 8.1.7</title>
     <meta name="description" content="Generator laporan harian MBG untuk SPPG Cilodong Sukamaju.">
     <meta name="robots" content="noindex,nofollow,noarchive">
     <meta name="referrer" content="no-referrer">
@@ -151,9 +151,11 @@
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
             vertical-align: middle !important;
             text-align: center !important;
-            line-height: 1.25 !important;
+            line-height: 1 !important;
             font-weight: 800 !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
@@ -161,23 +163,30 @@
         }
 
         .report-badge-compact {
-            min-height: 15px !important;
+            min-height: 16px !important;
             padding-top: 2px !important;
-            padding-bottom: 2px !important;
+            padding-bottom: 3px !important;
         }
 
         .report-badge-header {
             min-height: 24px !important;
             padding-top: 4px !important;
-            padding-bottom: 4px !important;
+            padding-bottom: 5px !important;
         }
 
         .pdf-badge {
+            display: inline-block !important;
             min-height: 16px !important;
-            padding: 2px 8px !important;
+            padding: 2px 8px 3px 8px !important;
             border-radius: 6px !important;
             font-size: 8px !important;
             text-transform: uppercase !important;
+        }
+
+        .report-badge i {
+            display: inline-block !important;
+            flex: 0 0 auto !important;
+            line-height: 1 !important;
         }
 
         .report-safe-truncate {
@@ -191,39 +200,6 @@
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
-        }
-
-        /*
-         * html2canvas menghitung baseline inline-flex berbeda dari Chromium.
-         * Saat ekspor, gunakan tinggi dan line-height deterministik agar teks
-         * badge tidak turun melewati bidang warna atau terpotong oleh tabel.
-         */
-        body.export-capture .pdf-badge {
-            display: inline-block !important;
-            height: 16px !important;
-            min-height: 16px !important;
-            padding: 0 8px !important;
-            line-height: 16px !important;
-            vertical-align: top !important;
-            overflow: visible !important;
-        }
-
-        body.export-capture .report-badge-compact {
-            display: inline-block !important;
-            height: 16px !important;
-            min-height: 16px !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            line-height: 16px !important;
-            vertical-align: top !important;
-            overflow: visible !important;
-        }
-
-        body.export-capture .report-badge-compact i {
-            display: inline-block !important;
-            line-height: 16px !important;
-            vertical-align: top !important;
-            margin-right: 3px !important;
         }
 
         body.export-capture .report-safe-truncate {
@@ -715,7 +691,7 @@
                 <div>
                     <h1 class="text-sm font-black text-slate-900 tracking-tight flex items-center gap-1.5">
                         <span class="theme-text-primary">MBG DAILY REPORT</span>
-                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1.6</span>
+                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1.7</span>
                     </h1>
                     <p class="text-[11px] text-slate-500 font-medium disp-sppg-name">SPPG CILODONG SUKAMAJU 02 - YAYASAN BERKAH SITI ASMAH</p>
                 </div>
@@ -804,7 +780,7 @@
             </div>
 
             <details id="reportArchivePanel" open class="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1.6</summary>
+                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1.7</summary>
                 <div class="mt-3 space-y-2">
                     <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
                         <span class="text-[10px] font-bold text-slate-500 block">Laporan aktif</span>
@@ -3553,7 +3529,7 @@
                 Object.keys(localStorage).filter(key => key.startsWith('mbg_autosave_checkpoint_')).forEach(key => { checkpoints[key] = JSON.parse(localStorage.getItem(key)); });
                 const migrationSafety = localStorage.getItem(window.REPORT_MIGRATION_BACKUP_KEY);
                 const backup = {
-                    app: 'MBG Daily Report', version: '8.1.6', schemaVersion: 4, exportedAt: new Date().toISOString(),
+                    app: 'MBG Daily Report', version: '8.1.7', schemaVersion: 4, exportedAt: new Date().toISOString(),
                     currentSppgKey: window.currentSppgKey, currentReportId: window.currentReportId,
                     archive: window.reportArchive, checkpoints, assets,
                     migrationMetadata: window.reportArchive?.migration || null,
@@ -3562,7 +3538,7 @@
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `Backup MBG 8.1.6 - ${new Date().toISOString().slice(0, 10)}.json`;
+                link.download = `Backup MBG 8.1.7 - ${new Date().toISOString().slice(0, 10)}.json`;
                 document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
                 window.notifyUser('Backup JSON berhasil dibuat.', 'success');
             } catch (error) {
@@ -6120,9 +6096,18 @@
             const imgs = Array.from(element.querySelectorAll('img'));
             await Promise.all(imgs.map(async img => {
                 if (!img.complete) {
-                    await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+                    await new Promise(resolve => {
+                        const finish = () => {
+                            img.removeEventListener('load', finish);
+                            img.removeEventListener('error', finish);
+                            resolve();
+                        };
+                        img.addEventListener('load', finish, { once: true });
+                        img.addEventListener('error', finish, { once: true });
+                        if (img.complete) finish();
+                    });
                 }
-                if (img.decode) {
+                if (typeof img.decode === 'function') {
                     try { await img.decode(); } catch (e) {}
                 }
             }));
@@ -6157,28 +6142,41 @@
                     compress: true
                 });
 
-                const pages = document.querySelectorAll('.a4-page');
+                const pages = Array.from(document.querySelectorAll('.a4-page'));
+                if (pages.length !== 9) {
+                    throw new Error(`Jumlah halaman laporan tidak sesuai: ${pages.length} dari 9 halaman.`);
+                }
+                let renderedPagesCount = 0;
                 for (let i = 0; i < pages.length; i++) {
                     const page = pages[i];
-                    if (i > 0) pdf.addPage();
                     await ensureImagesLoaded(page);
 
                     const canvas = await html2canvas(page, {
                         scale: 2.0,
                         useCORS: true,
                         logging: false,
-                        allowTaint: true,
+                        allowTaint: false,
                         backgroundColor: '#ffffff',
                         imageTimeout: 15000,
                         ignoreElements: element => element.classList && element.classList.contains('no-print')
                     });
 
+                    if (canvas.width <= 0 || canvas.height <= 0) {
+                        throw new Error(`Halaman ${i + 1} gagal dirender ke kanvas.`);
+                    }
+
                     const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    if (renderedPagesCount > 0) pdf.addPage();
                     pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+                    renderedPagesCount++;
 
                     // Bersihkan objek kanvas secara eksplisit
                     canvas.width = 0;
                     canvas.height = 0;
+                }
+
+                if (renderedPagesCount !== 9) {
+                    throw new Error(`PDF hanya berhasil merender ${renderedPagesCount} dari 9 halaman.`);
                 }
 
                 const sppgData = SPPG_DATABASE[window.currentSppgKey] || SPPG_DATABASE.sppg1;
@@ -6218,7 +6216,7 @@
             window.syncData();
             if (!window.confirmValidationBeforeExport()) return;
             const content = document.getElementById('previewStage').innerHTML;
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1.6</title></head><body>";
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1.7</title></head><body>";
             const footer = "</body></html>";
             const sourceHTML = header + content + footer;
 

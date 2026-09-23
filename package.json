@@ -1,6 +1,6 @@
 {
   "name": "sistem-generator-laporan-mbg",
-  "version": "8.1.6",
+  "version": "8.1.7",
   "private": true,
   "scripts": {
     "build:assets": "tailwindcss -i src/tailwind.css -o dist/assets/app.css --minify --content dist/index.html && node scripts/copy-vendor.cjs",
