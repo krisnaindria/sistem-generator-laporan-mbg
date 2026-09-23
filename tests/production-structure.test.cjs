@@ -258,7 +258,7 @@ test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
     assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?height: auto !important;[\s\S]*?line-height: 1 !important;[\s\S]*?font-weight: 800 !important;/);
     assert.match(html, /\.report-badge-compact \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding-top: 2px !important;[\s\S]*?padding-bottom: 3px !important;/);
     assert.match(html, /\.report-badge-header \{[\s\S]*?min-height: 24px !important;[\s\S]*?padding-top: 4px !important;[\s\S]*?padding-bottom: 5px !important;/);
-    assert.match(html, /\.pdf-badge \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 2px 8px 3px 8px !important;/);
+    assert.match(html, /\.pdf-badge \{[\s\S]*?display: inline-block !important;[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 2px 8px 3px 8px !important;/);
     assert.match(html, /\.report-badge i \{[\s\S]*?flex: 0 0 auto !important;[\s\S]*?line-height: 1 !important;/);
     assert.doesNotMatch(html, /body\.export-capture \.pdf-badge/);
     assert.doesNotMatch(html, /body\.export-capture \.report-badge-compact/);
