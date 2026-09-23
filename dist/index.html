@@ -5576,11 +5576,7 @@
             const b3DistList = window.activeDistributionSummary.b3 || [];
             const b3WasteList = institutions.filter(i => i.isPosyandu);
             const findInstitutionMatch = (name, list) => {
-                const normalized = window.normalizeName(name);
-                return list.find(item => {
-                    const candidate = item.normalized || window.normalizeName(item.name);
-                    return candidate === normalized || candidate.includes(normalized) || normalized.includes(candidate);
-                });
+                return list.find(item => window.MBGCore.institutionsMatch(name, item.name));
             };
             if (!isCommunalDetected) {
                 schoolDistList.forEach(item => {
@@ -5643,8 +5639,7 @@
                     htmlRasio = schoolWasteList.map((sw, idx) => {
                         let porsi = sw.portion || 0;
                         if (!porsi) {
-                            const normWaste = window.normalizeName(sw.name);
-                            let matchedDist = schoolDistList.find(sd => sd.normalized === normWaste || normWaste.includes(sd.normalized));
+                            let matchedDist = schoolDistList.find(sd => window.MBGCore.institutionsMatch(sw.name, sd.name));
                             if (matchedDist) porsi = matchedDist.totalPorsi;
                         }
                         const estimasiKgPerSekolah = separatedMetrics.hasPartition && totalSiswaSekolah > 0 ? (porsi * schoolWasteKg) / totalSiswaSekolah : null;
@@ -5679,10 +5674,9 @@
 
                     const validSchools = schoolWasteList.filter(s => s.total > 0);
                     const schoolRatios = validSchools.map(sw => {
-                        const normWaste = window.normalizeName(sw.name);
                         let porsi = sw.portion || 0;
                         if (!porsi) {
-                            let matchedDist = schoolDistList.find(sd => sd.normalized === normWaste || normWaste.includes(sd.normalized));
+                            let matchedDist = schoolDistList.find(sd => window.MBGCore.institutionsMatch(sw.name, sd.name));
                             if (matchedDist) porsi = matchedDist.totalPorsi;
                         }
                         const gramPerSiswa = porsi > 0 ? (sw.total * 1000) / porsi : 0;
