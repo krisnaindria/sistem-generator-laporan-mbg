@@ -53,6 +53,46 @@ test('pencocokan institusi mempertahankan RW dan nomor pos sebagai pembeda', () 
     assert.equal(core.institutionsMatch('Pos Mawar (Yonif 328)', 'Pos Mawar'), false);
 });
 
+test('alias Posyandu tanpa nomor cocok satu-ke-satu dengan titik bernomor', () => {
+    const distribution = [
+        { name: 'POSYANDU ANGGREK (RW 05)' },
+        { name: 'POSYANDU BOUGENVILLE (RW 14)' },
+        { name: 'POSYANDU ALAMANDA (RW 24)' },
+        { name: 'POSYANDU KAMBOJA (RW 04)' },
+        { name: 'POSYANDU ANYELIR 3 (RW 16)' }
+    ];
+    const waste = [
+        { name: 'PY.Anggrek' },
+        { name: 'PY.Bougenville' },
+        { name: 'PY. Alamanda' },
+        { name: 'PY Kamboja' },
+        { name: 'PY Anyelir' }
+    ];
+    distribution.forEach((item, index) => {
+        assert.equal(core.findInstitutionMatch(item.name, waste, distribution), waste[index]);
+    });
+});
+
+test('alias Posyandu tanpa nomor ditolak bila kandidatnya ambigu', () => {
+    const distribution = [
+        { name: 'Posyandu Kenanga 1' },
+        { name: 'Posyandu Kenanga 2' }
+    ];
+    const waste = [{ name: 'PY Kenanga' }];
+    assert.equal(core.findInstitutionMatch(distribution[0].name, waste, distribution), null);
+    assert.equal(core.findInstitutionMatch(distribution[1].name, waste, distribution), null);
+});
+
+test('RW dapat membedakan alias Posyandu yang nomor titiknya dihilangkan', () => {
+    const distribution = [
+        { name: 'Posyandu Kenanga 1 (RW 05)' },
+        { name: 'Posyandu Kenanga 2 (RW 06)' }
+    ];
+    const waste = [{ name: 'PY Kenanga (RW 05)' }];
+    assert.equal(core.findInstitutionMatch(distribution[0].name, waste, distribution), waste[0]);
+    assert.equal(core.findInstitutionMatch(distribution[1].name, waste, distribution), null);
+});
+
 test('klasifikasi sekolah membedakan B3 dan sekolah', () => {
     assert.equal(core.isSchoolInstitution('SMPN 6 Depok'), true);
     assert.equal(core.isSchoolInstitution('PAUD Dahlia'), true);
