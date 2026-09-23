@@ -249,3 +249,18 @@ test('validasi sisa makanan mencocokkan alias institusi secara aman', () => {
     assert.match(html, /window\.MBGCore\.institutionsMatch\(name, item\.name\)/);
     assert.equal((html.match(/window\.MBGCore\.institutionsMatch\(sw\.name, sd\.name\)/g) || []).length, 2);
 });
+
+test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
+    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?display: inline-flex !important;[\s\S]*?align-items: center !important;[\s\S]*?justify-content: center !important;/);
+    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?line-height: 1\.25 !important;[\s\S]*?font-weight: 800 !important;/);
+    assert.match(html, /\.pdf-badge \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 2px 8px !important;/);
+    assert.doesNotMatch(html, /\.pdf-badge \{[\s\S]*?display: inline-block/);
+    assert.doesNotMatch(html, /py-0\.2/);
+    assert.equal((html.match(/report-badge-header/g) || []).length >= 9, true);
+    assert.match(html, /badgeEl\.className = `report-badge report-badge-compact/);
+});
+
+test('teks ringkas laporan menyediakan ruang vertikal saat diraster', () => {
+    assert.match(html, /\.report-safe-truncate \{[\s\S]*?min-height: 1\.4em !important;[\s\S]*?line-height: 1\.4 !important;[\s\S]*?padding-bottom: 1px !important;/);
+    assert.equal((html.match(/report-safe-truncate/g) || []).length >= 5, true);
+});

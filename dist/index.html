@@ -146,18 +146,47 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+        .report-badge,
         .pdf-badge {
-            display: inline-block !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             vertical-align: middle !important;
             text-align: center !important;
-            line-height: 1 !important;
-            padding: 2.5px 8px 3px 8px !important;
-            border-radius: 6px !important;
-            font-weight: 900 !important;
-            font-size: 8px !important;
-            text-transform: uppercase !important;
+            line-height: 1.25 !important;
+            font-weight: 800 !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
+            overflow: visible !important;
+        }
+
+        .report-badge-compact {
+            min-height: 15px !important;
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
+        }
+
+        .report-badge-header {
+            min-height: 24px !important;
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+        }
+
+        .pdf-badge {
+            min-height: 16px !important;
+            padding: 2px 8px !important;
+            border-radius: 6px !important;
+            font-size: 8px !important;
+            text-transform: uppercase !important;
+        }
+
+        .report-safe-truncate {
+            display: block !important;
+            min-width: 0 !important;
+            min-height: 1.4em !important;
+            line-height: 1.4 !important;
+            padding-bottom: 1px !important;
+            box-sizing: content-box !important;
         }
 
         .menu-title-2lines {
@@ -987,7 +1016,7 @@
                         <label class="text-[10px] font-bold text-slate-700 flex items-center gap-1">
                             <i class="fa-solid fa-scale-balanced text-purple-600"></i> Mode Penimbangan:
                         </label>
-                        <span id="badgeWasteModeStatus" class="text-[8.5px] font-black px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 border border-blue-200">
+                        <span id="badgeWasteModeStatus" class="report-badge report-badge-compact text-[8.5px] px-1.5 rounded bg-blue-100 text-blue-800 border border-blue-200">
                             Terpusat (SPPG)
                         </span>
                     </div>
@@ -1298,7 +1327,7 @@
                                 <span class="text-[9px] font-bold text-white/80 uppercase tracking-wide block">LOGISTIK & PERSIAPAN OPERASIONAL</span>
                                 <h2 class="text-sm font-black text-white">KEDATANGAN BAHAN BAKU & KESIAPAN DAPUR</h2>
                             </div>
-                            <span id="dispSubTanggal" class="text-[9.5px] font-black bg-white/20 theme-accent-text py-1 px-3 rounded-lg border border-white/20 disp-sub-tanggal">Kamis, 10 September 2026</span>
+                            <span id="dispSubTanggal" class="report-badge report-badge-header text-[9.5px] bg-white/20 theme-accent-text px-3 rounded-lg border border-white/20 disp-sub-tanggal">Kamis, 10 September 2026</span>
                         </div>
 
                         <!-- ZONA ATAS: BAHAN BAKU + LOGISTIK + EVALUASI BUAH -->
@@ -1308,7 +1337,7 @@
                                     <span class="text-[9.5px] font-black uppercase tracking-wider theme-accent-text flex items-center gap-1.5">
                                         <i class="fa-solid fa-truck-ramp-box"></i> KEDATANGAN BAHAN BAKU UTAMA
                                     </span>
-                                    <span class="text-[8px] font-bold text-emerald-950 bg-emerald-200/90 px-1.5 py-0.5 rounded shadow-2xs flex items-center gap-1">
+                                    <span class="report-badge report-badge-compact text-[8px] text-emerald-950 bg-emerald-200/90 px-1.5 rounded shadow-2xs gap-1">
                                         <i class="fa-solid fa-circle-check text-emerald-800 text-[8px]"></i> QC Passed
                                     </span>
                                 </div>
@@ -1398,11 +1427,11 @@
                             <h2 class="text-sm font-black text-white">DISTRIBUSI SEKOLAH & PROGRAM KHUSUS B3</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-bold bg-white/10 text-white py-1 px-2.5 rounded-lg border border-white/20 flex items-center gap-1.5" title="Tanggal distribusi terkunci sesuai tanggal operasional laporan">
+                            <span class="report-badge report-badge-header text-[9px] bg-white/10 text-white px-2.5 rounded-lg border border-white/20 gap-1.5" title="Tanggal distribusi terkunci sesuai tanggal operasional laporan">
                                 <i class="fa-solid fa-lock text-emerald-300 text-[8px]"></i>
                                 <span class="disp-tanggal uppercase tracking-wider">JUMAT, 11 SEPTEMBER 2026</span>
                             </span>
-                            <span id="dispBadgeTotalDistribusi" class="text-[9.5px] font-black bg-white/20 theme-accent-text py-1 px-3 rounded-lg border border-white/20">Total: 2.113 Porsi</span>
+                            <span id="dispBadgeTotalDistribusi" class="report-badge report-badge-header text-[9.5px] bg-white/20 theme-accent-text px-3 rounded-lg border border-white/20">Total: 2.113 Porsi</span>
                         </div>
                     </div>
 
@@ -1435,7 +1464,7 @@
                                 <span id="titleHeaderPagi" class="text-[9px] font-black uppercase tracking-wider theme-accent-text">
                                     <i class="fa-solid fa-sun mr-1"></i> PENGIRIMAN PAGI (&lt; 09.00)
                                 </span>
-                                <span class="text-[8px] font-bold bg-black/20 text-white px-1.5 py-0.5 rounded" id="badgeSubtotalPagi">1.219 Porsi</span>
+                                <span class="report-badge report-badge-compact text-[8px] bg-black/20 text-white px-1.5 rounded" id="badgeSubtotalPagi">1.219 Porsi</span>
                             </div>
                             <table class="w-full text-left border-collapse text-[9px]">
                                 <thead>
@@ -1455,7 +1484,7 @@
                                 <span id="titleHeaderSiang" class="text-[9px] font-black uppercase tracking-wider theme-accent-text">
                                     <i class="fa-solid fa-cloud-sun mr-1"></i> PENGIRIMAN SIANG (&gt; 11.00)
                                 </span>
-                                <span class="text-[8px] font-bold bg-black/20 text-white px-1.5 py-0.5 rounded" id="badgeSubtotalSiang">309 Porsi</span>
+                                <span class="report-badge report-badge-compact text-[8px] bg-black/20 text-white px-1.5 rounded" id="badgeSubtotalSiang">309 Porsi</span>
                             </div>
                             <table class="w-full text-left border-collapse text-[9px]">
                                 <thead>
@@ -1476,7 +1505,7 @@
                             <span id="titleHeaderB3" class="text-[9px] font-black uppercase tracking-wider theme-accent-text">
                                 <i class="fa-solid fa-hospital-user mr-1"></i> PROGRAM B3 - PENYALURAN POSYANDU (MULAI JAM 09.00)
                             </span>
-                            <span class="text-[8px] font-bold bg-black/20 text-white px-2 py-0.5 rounded">Wilayah Layanan SPPG</span>
+                            <span class="report-badge report-badge-compact text-[8px] bg-black/20 text-white px-2 rounded">Wilayah Layanan SPPG</span>
                         </div>
                         <table class="w-full text-left border-collapse text-[9px]">
                             <thead>
@@ -1515,14 +1544,14 @@
                             <h2 class="text-sm font-black text-white">LAPORAN SISA MAKANAN (FOOD WASTE)</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span id="badgeWasteCommunalIndicator" class="text-[8.5px] font-bold bg-amber-400/90 text-amber-950 py-0.5 px-2 rounded hidden">
+                            <span id="badgeWasteCommunalIndicator" class="report-badge report-badge-compact text-[8.5px] bg-amber-400/90 text-amber-950 px-2 rounded hidden">
                                 <i class="fa-solid fa-layer-group mr-1"></i>Penimbangan Terpusat SPPG
                             </span>
-                            <span class="text-[9px] font-bold bg-white/10 text-white py-1 px-2.5 rounded-lg border border-white/20 flex items-center gap-1.5">
+                            <span class="report-badge report-badge-header text-[9px] bg-white/10 text-white px-2.5 rounded-lg border border-white/20 gap-1.5">
                                 <i class="fa-solid fa-lock text-emerald-300 text-[8px]"></i>
                                 <span class="disp-tanggal uppercase tracking-wider">JUMAT, 11 SEPTEMBER 2026</span>
                             </span>
-                            <span id="dispTotalSisaHeader" class="text-[9.5px] font-black bg-white/20 theme-accent-text py-1 px-3 rounded-lg border border-white/20">Total: 31,66 kg</span>
+                            <span id="dispTotalSisaHeader" class="report-badge report-badge-header text-[9.5px] bg-white/20 theme-accent-text px-3 rounded-lg border border-white/20">Total: 31,66 kg</span>
                         </div>
                     </div>
 
@@ -1585,7 +1614,7 @@
                             <span class="text-[9px] font-bold text-white/80 uppercase tracking-wide block">STATISTIK & EVALUASI EFISIENSI PORSI</span>
                             <h2 class="text-sm font-black text-white">ANALISIS SISA MAKANAN (FOOD WASTE ANALYTICS)</h2>
                         </div>
-                        <span id="dispSubHeaderSekolahPorsi" class="text-[9.5px] font-black bg-white/20 theme-accent-text py-1 px-3 rounded-lg border border-white/20">
+                        <span id="dispSubHeaderSekolahPorsi" class="report-badge report-badge-header text-[9.5px] bg-white/20 theme-accent-text px-3 rounded-lg border border-white/20">
                             Khusus Siswa Sekolah
                         </span>
                     </div>
@@ -1594,19 +1623,19 @@
                     <div class="grid grid-cols-4 gap-2 mb-2.5 text-center">
                         <div class="bg-slate-50 border border-slate-200 p-2 rounded-xl">
                             <span class="text-[7.5px] font-bold text-slate-400 uppercase block" id="kpiVolTitle">VOLUME TERBANYAK</span>
-                            <span class="text-[11px] font-black text-slate-900 block mt-0.5 truncate" id="kpiVolName">SDN Sukamaju 06</span>
+                            <span class="report-safe-truncate text-[11px] font-black text-slate-900 block mt-0.5 truncate" id="kpiVolName">SDN Sukamaju 06</span>
                             <span class="text-[9px] font-bold text-slate-600" id="kpiVolVal">10,48 kg (33,1%)</span>
                         </div>
                         <div class="bg-purple-50 border border-purple-200 p-2 rounded-xl">
                             <span class="text-[7.5px] font-bold text-purple-800 uppercase block" id="kpiPerSiswaTitle">SISA PER SISWA TERTINGGI</span>
-                            <span class="text-[11px] font-black text-purple-900 block mt-0.5 truncate" id="kpiPerSiswaName">SDN Sukamaju 09</span>
+                            <span class="report-safe-truncate text-[11px] font-black text-purple-900 block mt-0.5 truncate" id="kpiPerSiswaName">SDN Sukamaju 09</span>
                             <span class="text-[9px] font-bold text-purple-700" id="kpiPerSiswaVal">25,38 g / siswa</span>
                         </div>
                         <div class="theme-bg-light border theme-border-light p-2 rounded-xl relative">
                             <span class="text-[7.5px] font-bold theme-text-primary uppercase block">RATA-RATA SISWA SEKOLAH</span>
                             <span class="text-[11px] font-black theme-text-primary block mt-0.5" id="kpiAvgSekolah">20,72 g / Siswa</span>
                             <span class="text-[9px] text-slate-600" id="kpiAvgSekolahLabel">Dari 1.528 Porsi Sekolah</span>
-                            <span id="badgeWasteOverload" class="hidden absolute top-1 right-1 bg-red-600 text-white text-[7.5px] font-black px-1.5 py-0.2 rounded-full shadow-xs">Perhatian</span>
+                            <span id="badgeWasteOverload" class="report-badge report-badge-compact hidden absolute top-1 right-1 bg-red-600 text-white text-[7.5px] px-1.5 rounded-full shadow-xs">Perhatian</span>
                         </div>
                         <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-xl">
                             <span class="text-[7.5px] font-bold text-emerald-800 uppercase block">PROGRAM B3 (POSYANDU)</span>
@@ -1650,7 +1679,7 @@
                                 <div>
                                     <div class="flex justify-between items-start mb-1">
                                         <span class="text-[8px] font-black text-red-600 uppercase tracking-wide">Peringkat 1</span>
-                                        <span class="text-[9px] font-black text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.2 rounded" id="compWastePct1">60.64%</span>
+                                        <span class="report-badge report-badge-compact text-[9px] text-red-600 bg-red-50 border border-red-200 px-1.5 rounded" id="compWastePct1">60.64%</span>
                                     </div>
                                     <h4 class="text-[9.5px] font-black text-slate-900 leading-tight" id="compWasteName1">TUMIS SAWI PUTIH</h4>
                                     <span class="text-[8.5px] font-black text-red-700 block mt-0.5" id="compWasteKg1">19,20 kg</span>
@@ -1664,7 +1693,7 @@
                                 <div>
                                     <div class="flex justify-between items-start mb-1">
                                         <span class="text-[8px] font-black text-amber-700 uppercase tracking-wide">Peringkat 2</span>
-                                        <span class="text-[9px] font-black text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded" id="compWastePct2">15.73%</span>
+                                        <span class="report-badge report-badge-compact text-[9px] text-amber-700 bg-amber-50 border border-amber-200 px-1.5 rounded" id="compWastePct2">15.73%</span>
                                     </div>
                                     <h4 class="text-[9.5px] font-black text-slate-900 leading-tight" id="compWasteName2">NASI PUTIH</h4>
                                     <span class="text-[8.5px] font-black text-amber-700 block mt-0.5" id="compWasteKg2">4,98 kg</span>
@@ -1678,7 +1707,7 @@
                                 <div>
                                     <div class="flex justify-between items-start mb-1">
                                         <span class="text-[8px] font-black text-slate-500 uppercase tracking-wide">Peringkat 3</span>
-                                        <span class="text-[9px] font-black text-slate-700 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded" id="compWastePct3">15.22%</span>
+                                        <span class="report-badge report-badge-compact text-[9px] text-slate-700 bg-slate-100 border border-slate-200 px-1.5 rounded" id="compWastePct3">15.22%</span>
                                     </div>
                                     <h4 class="text-[9.5px] font-black text-slate-900 leading-tight" id="compWasteName3">EDAMAME</h4>
                                     <span class="text-[8.5px] font-black text-slate-700 block mt-0.5" id="compWasteKg3">4,82 kg</span>
@@ -1692,7 +1721,7 @@
                                 <div>
                                     <div class="flex justify-between items-start mb-1">
                                         <span class="text-[8px] font-black text-emerald-800 uppercase tracking-wide">Peringkat 4</span>
-                                        <span class="text-[9px] font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2 rounded" id="compWastePct4">8.40%</span>
+                                        <span class="report-badge report-badge-compact text-[9px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 rounded" id="compWastePct4">8.40%</span>
                                     </div>
                                     <h4 class="text-[9.5px] font-black text-emerald-950 leading-tight" id="compWasteName4">CREAMY TOMATO EGG</h4>
                                     <span class="text-[8.5px] font-black text-emerald-700 block mt-0.5" id="compWasteKg4">2,66 kg</span>
@@ -1710,7 +1739,7 @@
                             <h3 class="text-xs font-black text-purple-950 uppercase tracking-wider flex items-center gap-1.5">
                                 <i class="fa-solid fa-clipboard-check text-purple-700 text-sm"></i> ANALISIS AHLI GIZI & RENCANA TINDAKAN CHEF
                             </h3>
-                            <span id="badgeRecommendationConfidence" class="text-[8.5px] font-extrabold bg-slate-600 text-white px-2.5 py-0.5 rounded-full shadow-xs uppercase">
+                            <span id="badgeRecommendationConfidence" class="report-badge report-badge-compact text-[8.5px] bg-slate-600 text-white px-2.5 rounded-full shadow-xs uppercase">
                                 Menilai Data
                             </span>
                         </div>
@@ -1779,7 +1808,7 @@
                                 <h2 class="text-xs font-black text-white">PERSIAPAN, SORTIR & PENGOLAHAN MENU DI DAPUR SPPG</h2>
                             </div>
                         </div>
-                        <span class="text-[9px] font-black bg-white/20 theme-accent-text py-1 px-2.5 rounded-lg border border-white/20">
+                        <span class="report-badge report-badge-header text-[9px] bg-white/20 theme-accent-text px-2.5 rounded-lg border border-white/20">
                             Pukul 01.00 - 06.30 WIB
                         </span>
                     </div>
@@ -1807,7 +1836,7 @@
                                 <h2 class="text-xs font-black text-white">LOADING, PACKING BOX & DISTRIBUSI ARMADA BGN</h2>
                             </div>
                         </div>
-                        <span class="text-[9px] font-black bg-white/20 theme-accent-text py-1 px-2.5 rounded-lg border border-white/20">
+                        <span class="report-badge report-badge-header text-[9px] bg-white/20 theme-accent-text px-2.5 rounded-lg border border-white/20">
                             Pukul 07.00 - 11.30 WIB
                         </span>
                     </div>
@@ -1835,7 +1864,7 @@
                                 <h2 class="text-xs font-black text-white">PELAKSANAAN MAKAN DI SEKOLAH & POSYANDU B3</h2>
                             </div>
                         </div>
-                        <span class="text-[9px] font-black bg-white/20 theme-accent-text py-1 px-2.5 rounded-lg border border-white/20">
+                        <span class="report-badge report-badge-header text-[9px] bg-white/20 theme-accent-text px-2.5 rounded-lg border border-white/20">
                             Pukul 08.30 - 12.30 WIB
                         </span>
                     </div>
@@ -1860,7 +1889,7 @@
                             <span class="text-[9px] font-bold text-white/80 uppercase tracking-wide block">LEMBAR VALIDASI & PENGESAHAN LAPORAN</span>
                             <h2 class="text-sm font-black text-white">VERIFIKASI AKHIR OPERASIONAL & KEUANGAN</h2>
                         </div>
-                        <span class="text-[9.5px] font-black bg-white/20 theme-accent-text py-1 px-3 rounded-lg border border-white/20 disp-tanggal-full">Depok, 11 September 2026</span>
+                        <span class="report-badge report-badge-header text-[9.5px] bg-white/20 theme-accent-text px-3 rounded-lg border border-white/20 disp-tanggal-full">Depok, 11 September 2026</span>
                     </div>
 
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-[9.5px] space-y-1.5 mb-4 text-slate-700">
@@ -2539,7 +2568,7 @@
                         <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-slate-50 flex items-center justify-center relative group p-1 h-[120mm]">
                             <label class="cursor-pointer block relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk ganti Foto ${i+1}">
                                 <img src="${src}" alt="Foto ${i+1}" class="high-res-poster w-full h-full object-cover group-hover:scale-[1.02] transition duration-200">
-                                <span class="absolute top-2 left-2 bg-slate-900/80 text-white text-[8px] font-black px-2 py-0.5 rounded-md shadow-xs">
+                                <span class="report-badge report-badge-compact absolute top-2 left-2 bg-slate-900/80 text-white text-[8px] px-2 rounded-md shadow-xs">
                                     Foto ${i+1}
                                 </span>
                                 <div class="no-print absolute bottom-2 right-2 bg-black/75 hover:bg-black text-white text-[8.5px] font-bold px-2 py-1 rounded-md shadow transition flex items-center gap-1 pointer-events-none opacity-0 group-hover:opacity-100">
@@ -2560,7 +2589,7 @@
                         <div class="border border-slate-200 rounded-lg overflow-hidden shadow-xs bg-slate-50 flex items-center justify-center relative group p-1 h-[79mm]">
                             <label class="cursor-pointer block relative w-full h-full rounded-md overflow-hidden flex items-center justify-center bg-white" title="Klik untuk ganti Foto ${i+1}">
                                 <img src="${src}" alt="Foto ${i+1}" class="high-res-poster w-full h-full object-cover group-hover:scale-[1.02] transition duration-200">
-                                <span class="absolute top-1.5 left-1.5 bg-slate-900/80 text-white text-[7.5px] font-black px-1.5 py-0.2 rounded shadow-xs">
+                                <span class="report-badge report-badge-compact absolute top-1.5 left-1.5 bg-slate-900/80 text-white text-[7.5px] px-1.5 rounded shadow-xs">
                                     Foto ${i+1}
                                 </span>
                                 <div class="no-print absolute bottom-1.5 right-1.5 bg-black/75 hover:bg-black text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow transition flex items-center gap-1 pointer-events-none opacity-0 group-hover:opacity-100">
@@ -3235,7 +3264,7 @@
                 }
                 if (badgeStatus) {
                     badgeStatus.textContent = 'Terpusat (SPPG)';
-                    badgeStatus.className = 'text-[8.5px] font-black px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 border border-amber-300';
+                    badgeStatus.className = 'report-badge report-badge-compact text-[8.5px] px-1.5 rounded bg-amber-100 text-amber-900 border border-amber-300';
                 }
             } else {
                 if (btnDetail) {
@@ -3246,7 +3275,7 @@
                 }
                 if (badgeStatus) {
                     badgeStatus.textContent = 'Rincian Sekolah';
-                    badgeStatus.className = 'text-[8.5px] font-black px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 border border-blue-200';
+                    badgeStatus.className = 'report-badge report-badge-compact text-[8.5px] px-1.5 rounded bg-blue-100 text-blue-800 border border-blue-200';
                 }
             }
 
@@ -4548,14 +4577,14 @@
                                     <i class="fa-solid ${group.icon} text-[8.5px] opacity-80"></i>
                                     ${e(group.title)}
                                 </span>
-                                <span class="text-[7px] font-bold px-1.5 py-0.2 rounded-full ${group.pillBg}">
+                                <span class="report-badge report-badge-compact text-[7px] px-1.5 rounded-full ${group.pillBg}">
                                     ${group.items.length} item
                                 </span>
                             </div>
                             <div class="space-y-0.5 px-0.5">
                                 ${group.items.map((it, idx) => `
                                     <div class="flex justify-between items-center py-0.5 px-1.5 rounded ${idx % 2 === 1 ? 'bg-slate-50/70' : 'bg-transparent'} text-[8.5px] hover:bg-slate-100/60 transition">
-                                        <span class="text-slate-700 font-medium truncate pr-1">${e(it.name)}</span>
+                                        <span class="report-safe-truncate text-slate-700 font-medium truncate pr-1">${e(it.name)}</span>
                                         <span class="font-bold text-slate-900 whitespace-nowrap pl-1 text-[8.5px]">${e(it.qty)}</span>
                                     </div>
                                 `).join('')}
@@ -4654,7 +4683,7 @@
                 if (totalReady > 0) {
                     containerReady.innerHTML = readyList.map(item => `
                         <div class="bg-white border border-emerald-200/70 hover:border-emerald-400 rounded-lg p-1.5 flex flex-col items-center justify-between text-center shadow-2xs transition min-h-[46px]">
-                            <span class="text-[7.5px] font-bold text-slate-500 uppercase tracking-tight truncate w-full block">${e(item.name)}</span>
+                            <span class="report-safe-truncate text-[7.5px] font-bold text-slate-500 uppercase tracking-tight truncate w-full block">${e(item.name)}</span>
                             <span class="text-[10px] font-black text-slate-900 mt-0.5 leading-none block">${e(item.qty)}</span>
                         </div>
                     `).join('');
@@ -5007,7 +5036,7 @@
 
             const setBadge = (label, colorClass) => {
                 badgeEl.textContent = label;
-                badgeEl.className = `text-[8.5px] font-extrabold text-white px-2.5 py-0.5 rounded-full shadow-xs uppercase ${colorClass}`;
+                badgeEl.className = `report-badge report-badge-compact text-[8.5px] text-white px-2.5 rounded-full shadow-xs uppercase ${colorClass}`;
             };
 
             const setEvidence = (html, tone) => {
