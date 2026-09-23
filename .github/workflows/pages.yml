@@ -1,4 +1,4 @@
-name: Validate and Deploy V8.1 to GitHub Pages
+name: Validate and Deploy V8.1.5 to GitHub Pages
 
 on:
   pull_request:
@@ -34,7 +34,7 @@ jobs:
       - name: Rebuild local production assets
         run: npm run build:assets
 
-      - name: Run V8.1 tests
+      - name: Run V8.1.5 tests
         run: npm test
 
       - name: Verify GitHub Pages package

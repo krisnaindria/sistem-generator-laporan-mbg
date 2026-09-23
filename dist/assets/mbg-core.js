@@ -110,6 +110,42 @@
         return true;
     }
 
+    function normalizePosyanduAlias(name) {
+        const source = String(name || '').toLowerCase().replace(/[\u00A0\u200B\uFEFF]/g, ' ').trim();
+        const identity = normalizeInstitutionIdentity(source);
+        const ordinalMatch = identity.key.match(/^(.*?)(\d+)$/);
+        return {
+            ...identity,
+            isPosyandu: /^\s*(?:py|posyandu|pos)\s*[.\-:]?\s*/i.test(source),
+            baseKey: ordinalMatch ? ordinalMatch[1] : identity.key,
+            ordinal: ordinalMatch ? String(Number(ordinalMatch[2])) : ''
+        };
+    }
+
+    function posyanduAliasesCompatible(left, right) {
+        if (!left.isPosyandu || !right.isPosyandu || !left.baseKey || left.baseKey !== right.baseKey) return false;
+        if (left.rw && right.rw && left.rw !== right.rw) return false;
+        if (left.ordinal && right.ordinal && left.ordinal !== right.ordinal) return false;
+        return true;
+    }
+
+    function findInstitutionMatch(name, candidates, peers = null) {
+        const list = Array.isArray(candidates) ? candidates : [];
+        const getName = item => typeof item === 'string' ? item : item?.name;
+        const exact = list.find(item => institutionsMatch(name, getName(item)));
+        if (exact) return exact;
+
+        const sourceAlias = normalizePosyanduAlias(name);
+        if (!sourceAlias.isPosyandu) return null;
+        const relaxed = list.filter(item => posyanduAliasesCompatible(sourceAlias, normalizePosyanduAlias(getName(item))));
+        if (relaxed.length !== 1) return null;
+
+        const targetAlias = normalizePosyanduAlias(getName(relaxed[0]));
+        const peerList = Array.isArray(peers) && peers.length ? peers : [{ name }];
+        const competingPeers = peerList.filter(item => posyanduAliasesCompatible(targetAlias, normalizePosyanduAlias(getName(item))));
+        return competingPeers.length === 1 ? relaxed[0] : null;
+    }
+
     function isSchoolInstitution(rawName) {
         const value = String(rawName || '').trim().toLowerCase();
         if (/(posyandu|pos\s+(anggrek|bougenville|alamanda|kamboja|anyelir|kenanga|melati|mawar)|py\.?|balita|bumil|busui|ibu hamil|ibu menyusui)/i.test(value)) return false;
@@ -232,6 +268,7 @@
         normalizeName,
         normalizeInstitutionIdentity,
         institutionsMatch,
+        findInstitutionMatch,
         isSchoolInstitution,
         analysisHash,
         pickAnalysisVariant,

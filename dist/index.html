@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Generator Laporan Harian MBG - Versi 8.1</title>
+    <title>Sistem Generator Laporan Harian MBG - Versi 8.1.5</title>
     <meta name="description" content="Generator laporan harian MBG untuk SPPG Cilodong Sukamaju.">
     <meta name="robots" content="noindex,nofollow,noarchive">
     <meta name="referrer" content="no-referrer">
@@ -671,7 +671,7 @@
                 <div>
                     <h1 class="text-sm font-black text-slate-900 tracking-tight flex items-center gap-1.5">
                         <span class="theme-text-primary">MBG DAILY REPORT</span>
-                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1</span>
+                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1.5</span>
                     </h1>
                     <p class="text-[11px] text-slate-500 font-medium disp-sppg-name">SPPG CILODONG SUKAMAJU 02 - YAYASAN BERKAH SITI ASMAH</p>
                 </div>
@@ -760,7 +760,7 @@
             </div>
 
             <details id="reportArchivePanel" open class="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1</summary>
+                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1.5</summary>
                 <div class="mt-3 space-y-2">
                     <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
                         <span class="text-[10px] font-bold text-slate-500 block">Laporan aktif</span>
@@ -3507,7 +3507,7 @@
                 Object.keys(localStorage).filter(key => key.startsWith('mbg_autosave_checkpoint_')).forEach(key => { checkpoints[key] = JSON.parse(localStorage.getItem(key)); });
                 const migrationSafety = localStorage.getItem(window.REPORT_MIGRATION_BACKUP_KEY);
                 const backup = {
-                    app: 'MBG Daily Report', version: '8.1', schemaVersion: 4, exportedAt: new Date().toISOString(),
+                    app: 'MBG Daily Report', version: '8.1.5', schemaVersion: 4, exportedAt: new Date().toISOString(),
                     currentSppgKey: window.currentSppgKey, currentReportId: window.currentReportId,
                     archive: window.reportArchive, checkpoints, assets,
                     migrationMetadata: window.reportArchive?.migration || null,
@@ -3516,7 +3516,7 @@
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `Backup MBG 8.1 - ${new Date().toISOString().slice(0, 10)}.json`;
+                link.download = `Backup MBG 8.1.5 - ${new Date().toISOString().slice(0, 10)}.json`;
                 document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
                 window.notifyUser('Backup JSON berhasil dibuat.', 'success');
             } catch (error) {
@@ -5604,19 +5604,26 @@
             const schoolWasteList = institutions.filter(i => !i.isPosyandu);
             const b3DistList = window.activeDistributionSummary.b3 || [];
             const b3WasteList = institutions.filter(i => i.isPosyandu);
-            const findInstitutionMatch = (name, list) => {
-                return list.find(item => window.MBGCore.institutionsMatch(name, item.name));
-            };
+            schoolWasteList.forEach(item => {
+                if (item.portion > 0) return;
+                const match = window.MBGCore.findInstitutionMatch(item.name, schoolDistList, schoolWasteList);
+                if (match) item.portion = match.totalPorsi || 0;
+            });
+            b3WasteList.forEach(item => {
+                if (item.portion > 0) return;
+                const match = window.MBGCore.findInstitutionMatch(item.name, b3DistList, b3WasteList);
+                if (match) item.portion = match.totalPorsi || 0;
+            });
             if (!isCommunalDetected) {
                 schoolDistList.forEach(item => {
-                    const match = findInstitutionMatch(item.name, schoolWasteList);
+                    const match = window.MBGCore.findInstitutionMatch(item.name, schoolWasteList, schoolDistList);
                     if (!match) window.addValidationIssue('error', `${item.name}: belum ditemukan pada laporan sisa makanan.`);
                     else if (match.portion > 0 && item.totalPorsi > 0 && match.portion !== item.totalPorsi) {
                         window.addValidationIssue('error', `${item.name}: porsi distribusi ${item.totalPorsi} tidak sama dengan porsi laporan sisa ${match.portion}.`);
                     }
                 });
                 b3DistList.forEach(item => {
-                    const match = findInstitutionMatch(item.name, b3WasteList);
+                    const match = window.MBGCore.findInstitutionMatch(item.name, b3WasteList, b3DistList);
                     if (!match) window.addValidationIssue('error', `${item.name}: penerima B3 belum ditemukan pada laporan sisa makanan.`);
                     else if (match.portion > 0 && item.totalPorsi > 0 && match.portion !== item.totalPorsi) {
                         window.addValidationIssue('error', `${item.name}: penerima distribusi B3 ${item.totalPorsi} tidak sama dengan laporan sisa ${match.portion}.`);
@@ -5668,7 +5675,7 @@
                     htmlRasio = schoolWasteList.map((sw, idx) => {
                         let porsi = sw.portion || 0;
                         if (!porsi) {
-                            let matchedDist = schoolDistList.find(sd => window.MBGCore.institutionsMatch(sw.name, sd.name));
+                            let matchedDist = window.MBGCore.findInstitutionMatch(sw.name, schoolDistList, schoolWasteList);
                             if (matchedDist) porsi = matchedDist.totalPorsi;
                         }
                         const estimasiKgPerSekolah = separatedMetrics.hasPartition && totalSiswaSekolah > 0 ? (porsi * schoolWasteKg) / totalSiswaSekolah : null;
@@ -5705,7 +5712,7 @@
                     const schoolRatios = validSchools.map(sw => {
                         let porsi = sw.portion || 0;
                         if (!porsi) {
-                            let matchedDist = schoolDistList.find(sd => window.MBGCore.institutionsMatch(sw.name, sd.name));
+                            let matchedDist = window.MBGCore.findInstitutionMatch(sw.name, schoolDistList, schoolWasteList);
                             if (matchedDist) porsi = matchedDist.totalPorsi;
                         }
                         const gramPerSiswa = porsi > 0 ? (sw.total * 1000) / porsi : 0;
@@ -6165,7 +6172,7 @@
             window.syncData();
             if (!window.confirmValidationBeforeExport()) return;
             const content = document.getElementById('previewStage').innerHTML;
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1</title></head><body>";
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1.5</title></head><body>";
             const footer = "</body></html>";
             const sourceHTML = header + content + footer;
 
