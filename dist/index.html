@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Generator Laporan Harian MBG - Versi 8.1.5</title>
+    <title>Sistem Generator Laporan Harian MBG - Versi 8.1.6</title>
     <meta name="description" content="Generator laporan harian MBG untuk SPPG Cilodong Sukamaju.">
     <meta name="robots" content="noindex,nofollow,noarchive">
     <meta name="referrer" content="no-referrer">
@@ -183,10 +183,54 @@
         .report-safe-truncate {
             display: block !important;
             min-width: 0 !important;
-            min-height: 1.4em !important;
-            line-height: 1.4 !important;
-            padding-bottom: 1px !important;
+            min-height: 1.65em !important;
+            line-height: 1.45 !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
             box-sizing: content-box !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        /*
+         * html2canvas menghitung baseline inline-flex berbeda dari Chromium.
+         * Saat ekspor, gunakan tinggi dan line-height deterministik agar teks
+         * badge tidak turun melewati bidang warna atau terpotong oleh tabel.
+         */
+        body.export-capture .pdf-badge {
+            display: inline-block !important;
+            height: 16px !important;
+            min-height: 16px !important;
+            padding: 0 8px !important;
+            line-height: 16px !important;
+            vertical-align: top !important;
+            overflow: visible !important;
+        }
+
+        body.export-capture .report-badge-compact {
+            display: inline-block !important;
+            height: 16px !important;
+            min-height: 16px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            line-height: 16px !important;
+            vertical-align: top !important;
+            overflow: visible !important;
+        }
+
+        body.export-capture .report-badge-compact i {
+            display: inline-block !important;
+            line-height: 16px !important;
+            vertical-align: top !important;
+            margin-right: 3px !important;
+        }
+
+        body.export-capture .report-safe-truncate {
+            min-height: 1.85em !important;
+            line-height: 1.5 !important;
+            padding-top: 1px !important;
+            padding-bottom: 3px !important;
         }
 
         .menu-title-2lines {
@@ -671,7 +715,7 @@
                 <div>
                     <h1 class="text-sm font-black text-slate-900 tracking-tight flex items-center gap-1.5">
                         <span class="theme-text-primary">MBG DAILY REPORT</span>
-                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1.5</span>
+                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1.6</span>
                     </h1>
                     <p class="text-[11px] text-slate-500 font-medium disp-sppg-name">SPPG CILODONG SUKAMAJU 02 - YAYASAN BERKAH SITI ASMAH</p>
                 </div>
@@ -760,7 +804,7 @@
             </div>
 
             <details id="reportArchivePanel" open class="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1.5</summary>
+                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1.6</summary>
                 <div class="mt-3 space-y-2">
                     <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
                         <span class="text-[10px] font-bold text-slate-500 block">Laporan aktif</span>
@@ -1623,19 +1667,21 @@
                     <div class="grid grid-cols-4 gap-2 mb-2.5 text-center">
                         <div class="bg-slate-50 border border-slate-200 p-2 rounded-xl">
                             <span class="text-[7.5px] font-bold text-slate-400 uppercase block" id="kpiVolTitle">VOLUME TERBANYAK</span>
-                            <span class="report-safe-truncate text-[11px] font-black text-slate-900 block mt-0.5 truncate" id="kpiVolName">SDN Sukamaju 06</span>
+                            <span class="report-safe-truncate text-[11px] font-black text-slate-900 block mt-0.5" id="kpiVolName">SDN Sukamaju 06</span>
                             <span class="text-[9px] font-bold text-slate-600" id="kpiVolVal">10,48 kg (33,1%)</span>
                         </div>
                         <div class="bg-purple-50 border border-purple-200 p-2 rounded-xl">
                             <span class="text-[7.5px] font-bold text-purple-800 uppercase block" id="kpiPerSiswaTitle">SISA PER SISWA TERTINGGI</span>
-                            <span class="report-safe-truncate text-[11px] font-black text-purple-900 block mt-0.5 truncate" id="kpiPerSiswaName">SDN Sukamaju 09</span>
+                            <span class="report-safe-truncate text-[11px] font-black text-purple-900 block mt-0.5" id="kpiPerSiswaName">SDN Sukamaju 09</span>
                             <span class="text-[9px] font-bold text-purple-700" id="kpiPerSiswaVal">25,38 g / siswa</span>
                         </div>
                         <div class="theme-bg-light border theme-border-light p-2 rounded-xl relative">
-                            <span class="text-[7.5px] font-bold theme-text-primary uppercase block">RATA-RATA SISWA SEKOLAH</span>
+                            <div class="flex items-start justify-center gap-1">
+                                <span class="text-[7.5px] font-bold theme-text-primary uppercase block">RATA-RATA SISWA SEKOLAH</span>
+                                <span id="badgeWasteOverload" class="report-badge report-badge-compact hidden shrink-0 bg-red-600 text-white text-[7.5px] px-1.5 rounded-full shadow-xs">Perhatian</span>
+                            </div>
                             <span class="text-[11px] font-black theme-text-primary block mt-0.5" id="kpiAvgSekolah">20,72 g / Siswa</span>
                             <span class="text-[9px] text-slate-600" id="kpiAvgSekolahLabel">Dari 1.528 Porsi Sekolah</span>
-                            <span id="badgeWasteOverload" class="report-badge report-badge-compact hidden absolute top-1 right-1 bg-red-600 text-white text-[7.5px] px-1.5 rounded-full shadow-xs">Perhatian</span>
                         </div>
                         <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-xl">
                             <span class="text-[7.5px] font-bold text-emerald-800 uppercase block">PROGRAM B3 (POSYANDU)</span>
@@ -3507,7 +3553,7 @@
                 Object.keys(localStorage).filter(key => key.startsWith('mbg_autosave_checkpoint_')).forEach(key => { checkpoints[key] = JSON.parse(localStorage.getItem(key)); });
                 const migrationSafety = localStorage.getItem(window.REPORT_MIGRATION_BACKUP_KEY);
                 const backup = {
-                    app: 'MBG Daily Report', version: '8.1.5', schemaVersion: 4, exportedAt: new Date().toISOString(),
+                    app: 'MBG Daily Report', version: '8.1.6', schemaVersion: 4, exportedAt: new Date().toISOString(),
                     currentSppgKey: window.currentSppgKey, currentReportId: window.currentReportId,
                     archive: window.reportArchive, checkpoints, assets,
                     migrationMetadata: window.reportArchive?.migration || null,
@@ -3516,7 +3562,7 @@
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `Backup MBG 8.1.5 - ${new Date().toISOString().slice(0, 10)}.json`;
+                link.download = `Backup MBG 8.1.6 - ${new Date().toISOString().slice(0, 10)}.json`;
                 document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
                 window.notifyUser('Backup JSON berhasil dibuat.', 'success');
             } catch (error) {
@@ -4584,7 +4630,7 @@
                             <div class="space-y-0.5 px-0.5">
                                 ${group.items.map((it, idx) => `
                                     <div class="flex justify-between items-center py-0.5 px-1.5 rounded ${idx % 2 === 1 ? 'bg-slate-50/70' : 'bg-transparent'} text-[8.5px] hover:bg-slate-100/60 transition">
-                                        <span class="report-safe-truncate text-slate-700 font-medium truncate pr-1">${e(it.name)}</span>
+                                        <span class="report-safe-truncate text-slate-700 font-medium pr-1">${e(it.name)}</span>
                                         <span class="font-bold text-slate-900 whitespace-nowrap pl-1 text-[8.5px]">${e(it.qty)}</span>
                                     </div>
                                 `).join('')}
@@ -4683,7 +4729,7 @@
                 if (totalReady > 0) {
                     containerReady.innerHTML = readyList.map(item => `
                         <div class="bg-white border border-emerald-200/70 hover:border-emerald-400 rounded-lg p-1.5 flex flex-col items-center justify-between text-center shadow-2xs transition min-h-[46px]">
-                            <span class="report-safe-truncate text-[7.5px] font-bold text-slate-500 uppercase tracking-tight truncate w-full block">${e(item.name)}</span>
+                            <span class="report-safe-truncate text-[7.5px] font-bold text-slate-500 uppercase tracking-tight w-full block">${e(item.name)}</span>
                             <span class="text-[10px] font-black text-slate-900 mt-0.5 leading-none block">${e(item.qty)}</span>
                         </div>
                     `).join('');
@@ -6172,7 +6218,7 @@
             window.syncData();
             if (!window.confirmValidationBeforeExport()) return;
             const content = document.getElementById('previewStage').innerHTML;
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1.5</title></head><body>";
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1.6</title></head><body>";
             const footer = "</body></html>";
             const sourceHTML = header + content + footer;
 
