@@ -1,0 +1,59 @@
+name: QA badge PDF hotfix
+
+on:
+  push:
+    branches:
+      - codex/badge-pdf-hotfix-v817
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render-pdf:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout QA branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Install browser driver for QA only
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/mbg-qa-http.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/mbg-qa-http.log
+          exit 1
+
+      - name: Generate PDF through production function
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: node scripts/qa-export-pdf.cjs
+
+      - name: Confirm PDF structure
+        run: |
+          pdfinfo qa-output/badge-hotfix-verification.pdf
+          test "$(pdfinfo qa-output/badge-hotfix-verification.pdf | awk '/^Pages:/ {print $2}')" = "9"
+
+      - name: Upload QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: badge-hotfix-pdf
+          path: qa-output/
+          if-no-files-found: error
+          retention-days: 3
