@@ -82,3 +82,42 @@ test('data utama tetap dipilih ketika checkpoint tidak lebih baru', () => {
     const checkpoint = core.buildAutosaveCheckpoint('sppg1', { menuVal: 'Data lama' }, 'periodic', '2026-09-17T04:00:00.000Z');
     assert.deepEqual(core.recoverSavedData(JSON.stringify(primary), JSON.stringify(checkpoint)), { data: primary, source: 'primary' });
 });
+
+test('laporan kosong V8.1 memakai struktur distribusi kanonis', () => {
+    assert.deepEqual(core.createEmptyDistributionState(), {
+        pagi: { time: '09.00', rows: [] },
+        siang: { time: '11.00', rows: [] },
+        b3: { time: '09.00', rows: [] },
+        sourceRaw: ''
+    });
+});
+
+test('normalisasi memperbaiki struktur distribusi laporan kosong V8.1 yang bermasalah', () => {
+    const broken = { morning: [], afternoon: [], b3: [], sourceRaw: '' };
+    assert.deepEqual(core.normalizeDistributionState(broken), core.createEmptyDistributionState());
+});
+
+test('normalisasi mempertahankan baris distribusi lama dan tidak mengubah sumber', () => {
+    const legacy = {
+        morning: [{ name: 'SDN Sukamaju 1', kecil: 10, besar: 20 }],
+        afternoon: [{ name: 'SDN Sukamaju 6', kecil: 5, besar: 6 }],
+        b3: [{ name: 'Pos Anggrek', balita: 7, bumil: 1, busui: 2 }],
+        sourceRaw: 'Data lama'
+    };
+    const normalized = core.normalizeDistributionState(legacy);
+    assert.equal(normalized.pagi.rows[0].name, 'SDN Sukamaju 1');
+    assert.equal(normalized.siang.rows[0].besar, 6);
+    assert.equal(normalized.b3.rows[0].busui, 2);
+    normalized.pagi.rows[0].name = 'Diubah';
+    assert.equal(legacy.morning[0].name, 'SDN Sukamaju 1');
+});
+
+test('normalisasi memakai hasil parsing teks ketika data terstruktur belum tersedia', () => {
+    const parsed = {
+        pagi: { time: '08.30', rows: [{ name: 'SDN 1', kecil: 1, besar: 2 }] },
+        siang: { time: '11.30', rows: [] },
+        b3: { time: '09.15', rows: [] },
+        sourceRaw: 'Teks distribusi'
+    };
+    assert.deepEqual(core.normalizeDistributionState({}, parsed), parsed);
+});
