@@ -28,7 +28,9 @@ test('autosave berkala membuat checkpoint setiap 30 detik dan saat halaman ditut
 });
 
 test('versi dan modul domain produksi termuat', () => {
-    assert.match(html, /VERSI 8\.1/);
+    assert.equal(packageJson.version, '8.1.5');
+    assert.match(html, /VERSI 8\.1\.5/);
+    assert.match(html, /version: '8\.1\.5'/);
     assert.match(html, /assets\/mbg-core\.js/);
     assert.match(html, /assets\/mbg-archive\.js/);
 });
