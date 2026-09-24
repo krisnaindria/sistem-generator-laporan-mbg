@@ -145,6 +145,12 @@
                 logging: false
             });
             document.getElementById('rasterOutput').appendChild(canvas);
+            const download = document.createElement('a');
+            download.id = 'downloadRaster';
+            download.href = canvas.toDataURL('image/png');
+            download.download = 'badge-raster-scale-2.png';
+            download.textContent = 'Unduh raster fixture';
+            document.getElementById('rasterOutput').appendChild(download);
             document.body.dataset.rasterReady = 'true';
         });
     </script>
