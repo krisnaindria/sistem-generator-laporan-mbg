@@ -28,9 +28,9 @@ test('autosave berkala membuat checkpoint setiap 30 detik dan saat halaman ditut
 });
 
 test('versi dan modul domain produksi termuat', () => {
-    assert.equal(packageJson.version, '8.1.7');
-    assert.match(html, /VERSI 8\.1\.7/);
-    assert.match(html, /version: '8\.1\.7'/);
+    assert.equal(packageJson.version, '8.1.8');
+    assert.match(html, /VERSI 8\.1\.8/);
+    assert.match(html, /version: '8\.1\.8'/);
     assert.match(html, /assets\/mbg-core\.js/);
     assert.match(html, /assets\/mbg-archive\.js/);
 });
@@ -159,6 +159,13 @@ test('V8.0.5 memperbaiki klasifikasi, kontras validasi, dan sinkronisasi workspa
     assert.match(html, /activePage\?\.scrollIntoView/);
     assert.match(html, /programmaticAccordionOpens = new WeakSet/);
     assert.match(html, /id="inputLogistikOperasional"[^>]+onblur="window\.normalizeMaterialTextarea\(this\)"/);
+});
+
+test('tema amber dan utilitas responsif tidak saling menimpa', () => {
+    assert.match(html, /\[data-theme="amber"\] :is\(\.theme-header, \.theme-bg-primary\) \.text-white \{[\s\S]*?color: var\(--theme-on-primary\) !important;/);
+    assert.match(html, /\[data-theme="amber"\] :is\(\.theme-header, \.theme-bg-primary\) \.text-white\\\/80/);
+    assert.match(html, /@media \(min-width: 1280px\) \{\s*#uiModeToggleLabel\.hidden \{ display: inline-block !important; \}/);
+    assert.doesNotMatch(html, /class="[^"]*\bbg-white\b[^"]*\bbg-emerald-50\/30\b/);
 });
 
 test('builder distribusi tetap utuh di sidebar sempit', () => {
