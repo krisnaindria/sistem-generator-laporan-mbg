@@ -255,13 +255,18 @@ test('validasi sisa makanan mencocokkan alias institusi secara aman', () => {
 
 test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
     assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?display: inline-flex !important;[\s\S]*?align-items: center !important;[\s\S]*?justify-content: center !important;/);
-    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?height: auto !important;[\s\S]*?line-height: 1 !important;[\s\S]*?font-weight: 800 !important;/);
-    assert.match(html, /\.report-badge-compact \{[\s\S]*?min-height: 16px !important;[\s\S]*?padding-top: 2px !important;[\s\S]*?padding-bottom: 3px !important;/);
-    assert.match(html, /\.report-badge-header \{[\s\S]*?min-height: 24px !important;[\s\S]*?padding-top: 4px !important;[\s\S]*?padding-bottom: 5px !important;/);
-    assert.match(html, /\.pdf-badge \{[\s\S]*?display: inline-block !important;[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 2px 8px 3px 8px !important;/);
+    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?line-height: 1 !important;[\s\S]*?font-weight: 800 !important;[\s\S]*?overflow: hidden !important;/);
+    assert.match(html, /\.report-badge-compact \{[\s\S]*?height: 16px !important;[\s\S]*?min-height: 16px !important;[\s\S]*?padding-top: 0 !important;[\s\S]*?padding-bottom: 0 !important;/);
+    assert.match(html, /\.report-badge-header \{[\s\S]*?height: 24px !important;[\s\S]*?min-height: 24px !important;[\s\S]*?padding-top: 0 !important;[\s\S]*?padding-bottom: 0 !important;/);
+    assert.match(html, /\.pdf-badge \{[\s\S]*?height: 16px !important;[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 0 8px !important;/);
+    const pdfBadgeRule = html.match(/\.pdf-badge \{([^}]*)\}/);
+    assert.ok(pdfBadgeRule);
+    assert.doesNotMatch(pdfBadgeRule[1], /display: inline-block !important;/);
+    assert.match(html, /\.report-badge-content \{[\s\S]*?display: inline-flex !important;[\s\S]*?align-items: center !important;[\s\S]*?line-height: 1\.15 !important;/);
     assert.match(html, /\.report-badge i \{[\s\S]*?flex: 0 0 auto !important;[\s\S]*?line-height: 1 !important;/);
-    assert.doesNotMatch(html, /body\.export-capture \.pdf-badge/);
-    assert.doesNotMatch(html, /body\.export-capture \.report-badge-compact/);
+    assert.doesNotMatch(html, /body\.export-capture :is\(\.report-badge|body\.export-capture \.report-badge-(?:compact|header)|body\.export-capture \.pdf-badge/);
+    assert.match(html, /window\.normalizeReportBadges = function\(root = document\)/);
+    assert.match(html, /window\.normalizeReportBadges\(\);\s*const originalHTML = btn\.innerHTML/);
     assert.doesNotMatch(html, /line-height: 16px !important/);
     assert.doesNotMatch(html, /py-0\.2/);
     assert.equal((html.match(/report-badge-header/g) || []).length >= 9, true);
