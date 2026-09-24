@@ -152,35 +152,61 @@
             align-items: center !important;
             justify-content: center !important;
             width: auto !important;
-            height: auto !important;
             vertical-align: middle !important;
             text-align: center !important;
             line-height: 1 !important;
             font-weight: 800 !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
-            overflow: visible !important;
+            overflow: hidden !important;
         }
 
         .report-badge-compact {
+            height: 16px !important;
             min-height: 16px !important;
-            padding-top: 2px !important;
-            padding-bottom: 3px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
         }
 
         .report-badge-header {
+            height: 24px !important;
             min-height: 24px !important;
-            padding-top: 4px !important;
-            padding-bottom: 5px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
         }
 
         .pdf-badge {
-            display: inline-block !important;
+            height: 16px !important;
             min-height: 16px !important;
-            padding: 2px 8px 3px 8px !important;
+            padding: 0 8px !important;
             border-radius: 6px !important;
             font-size: 8px !important;
             text-transform: uppercase !important;
+        }
+
+        .report-badge-content {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: inherit !important;
+            max-width: 100% !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            box-sizing: border-box !important;
+        }
+
+        .report-badge-label {
+            display: block !important;
+            line-height: inherit !important;
+        }
+
+        body.export-capture .report-badge-compact > .report-badge-content,
+        body.export-capture .pdf-badge > .report-badge-content {
+            transform: translateY(-3px) !important;
+        }
+
+        body.export-capture .report-badge-header > .report-badge-content {
+            transform: translateY(-2px) !important;
         }
 
         .report-badge i {
@@ -5942,6 +5968,7 @@
             window.checkPageOverflow();
             window.assessReportReadiness();
             window.renderValidationSummary();
+            window.normalizeReportBadges();
         };
 
         window.syncChangedData = function(sourceId) {
@@ -5961,6 +5988,7 @@
                 window.checkPageOverflow();
                 window.assessReportReadiness();
                 window.renderValidationSummary();
+                window.normalizeReportBadges();
             } catch (error) {
                 console.error('Sinkronisasi parsial gagal:', error);
                 window.notifyUser('Preview belum dapat diperbarui. Data ketikan sudah disimpan.', 'error');
@@ -6113,6 +6141,36 @@
             }));
         }
 
+        window.normalizeReportBadges = function(root = document) {
+            const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+            const badges = scope.querySelectorAll('.report-badge, .pdf-badge');
+
+            badges.forEach(badge => {
+                const onlyChild = badge.children.length === 1 ? badge.firstElementChild : null;
+                if (onlyChild?.classList.contains('report-badge-content') && badge.childNodes.length === 1) return;
+
+                const content = document.createElement('span');
+                content.className = 'report-badge-content';
+
+                Array.from(badge.childNodes).forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const text = String(node.textContent || '').replace(/\s+/g, ' ').trim();
+                        if (!text) return;
+                        const label = document.createElement('span');
+                        label.className = 'report-badge-label';
+                        label.textContent = text;
+                        content.appendChild(label);
+                        return;
+                    }
+                    if (node.nodeType === Node.ELEMENT_NODE) content.appendChild(node);
+                });
+
+                badge.replaceChildren(content);
+            });
+
+            return badges.length;
+        };
+
         /* GENERATE PDF ULTRA-HD DENGAN REKAYASA MEMORI KANVAS */
         window.generatePDF = async function() {
             const btn = document.getElementById('btnExportPDF');
@@ -6123,6 +6181,7 @@
             }
             window.syncData();
             if (!window.confirmValidationBeforeExport()) return;
+            window.normalizeReportBadges();
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Rendering PDF Ultra-HD...</span>';
