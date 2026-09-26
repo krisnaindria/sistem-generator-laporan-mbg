@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'dist', 'index.html'), 'utf8');
 const coreSource = fs.readFileSync(path.join(__dirname, '..', 'dist', 'assets', 'mbg-core.js'), 'utf8');
+const badgeFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'badge-visual.html'), 'utf8');
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 
 test('dokumen memiliki bahasa, skip link, dan landmark utama', () => {
@@ -28,9 +29,9 @@ test('autosave berkala membuat checkpoint setiap 30 detik dan saat halaman ditut
 });
 
 test('versi dan modul domain produksi termuat', () => {
-    assert.equal(packageJson.version, '8.1.8');
-    assert.match(html, /VERSI 8\.1\.8/);
-    assert.match(html, /version: '8\.1\.8'/);
+    assert.equal(packageJson.version, '8.1.9');
+    assert.match(html, /VERSI 8\.1\.9/);
+    assert.match(html, /version: '8\.1\.9'/);
     assert.match(html, /assets\/mbg-core\.js/);
     assert.match(html, /assets\/mbg-archive\.js/);
 });
@@ -262,22 +263,32 @@ test('validasi sisa makanan mencocokkan alias institusi secara aman', () => {
 
 test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
     assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?display: inline-flex !important;[\s\S]*?align-items: center !important;[\s\S]*?justify-content: center !important;/);
-    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?line-height: 1 !important;[\s\S]*?font-weight: 800 !important;[\s\S]*?overflow: hidden !important;/);
-    assert.match(html, /\.report-badge-compact \{[\s\S]*?height: 16px !important;[\s\S]*?min-height: 16px !important;[\s\S]*?padding-top: 0 !important;[\s\S]*?padding-bottom: 0 !important;/);
-    assert.match(html, /\.report-badge-header \{[\s\S]*?height: 24px !important;[\s\S]*?min-height: 24px !important;[\s\S]*?padding-top: 0 !important;[\s\S]*?padding-bottom: 0 !important;/);
-    assert.match(html, /\.pdf-badge \{[\s\S]*?height: 16px !important;[\s\S]*?min-height: 16px !important;[\s\S]*?padding: 0 8px !important;/);
+    assert.match(html, /\.report-badge,\s*\.pdf-badge \{[\s\S]*?height: auto !important;[\s\S]*?line-height: 1\.35 !important;[\s\S]*?font-weight: 800 !important;[\s\S]*?overflow: visible !important;/);
+    assert.match(html, /\.report-badge-compact \{[\s\S]*?min-height: 18px !important;[\s\S]*?padding-top: 2px !important;[\s\S]*?padding-bottom: 2px !important;/);
+    assert.match(html, /\.report-badge-header \{[\s\S]*?min-height: 24px !important;[\s\S]*?padding-top: 4px !important;[\s\S]*?padding-bottom: 4px !important;/);
+    assert.match(html, /\.pdf-badge \{[\s\S]*?min-height: 18px !important;[\s\S]*?padding: 2px 8px !important;[\s\S]*?line-height: 1\.35 !important;/);
     const pdfBadgeRule = html.match(/\.pdf-badge \{([^}]*)\}/);
     assert.ok(pdfBadgeRule);
-    assert.doesNotMatch(pdfBadgeRule[1], /display: inline-block !important;/);
-    assert.match(html, /\.report-badge-content \{[\s\S]*?display: inline-flex !important;[\s\S]*?align-items: center !important;[\s\S]*?line-height: 1\.15 !important;/);
+    assert.doesNotMatch(pdfBadgeRule[1], /height:\s*16px|overflow:\s*hidden|display:\s*inline-block/);
+    const sharedBadgeRule = html.match(/\.report-badge,\s*\.pdf-badge \{([^}]*)\}/);
+    assert.ok(sharedBadgeRule);
+    assert.doesNotMatch(sharedBadgeRule[1], /transform|translate/);
     assert.match(html, /\.report-badge i \{[\s\S]*?flex: 0 0 auto !important;[\s\S]*?line-height: 1 !important;/);
     assert.doesNotMatch(html, /body\.export-capture :is\(\.report-badge|body\.export-capture \.report-badge-(?:compact|header)|body\.export-capture \.pdf-badge/);
-    assert.match(html, /window\.normalizeReportBadges = function\(root = document\)/);
-    assert.match(html, /window\.normalizeReportBadges\(\);\s*const originalHTML = btn\.innerHTML/);
-    assert.doesNotMatch(html, /line-height: 16px !important/);
+    assert.doesNotMatch(html, /report-badge-content|report-badge-label|normalizeReportBadges/);
     assert.doesNotMatch(html, /py-0\.2/);
     assert.equal((html.match(/report-badge-header/g) || []).length >= 9, true);
     assert.match(html, /badgeEl\.className = `report-badge report-badge-compact/);
+});
+
+test('fixture badge menguji konteks tabel, kartu, ikon, header, dan raster skala dua', () => {
+    assert.match(badgeFixture, /<table aria-label="Status daya terima">/);
+    for (const badgeName of ['tanggal', 'manis', 'tertinggi', 'konsumsi', 'zero-waste', 'analisis', 'perhatian', 'qc']) {
+        assert.match(badgeFixture, new RegExp(`data-qa="${badgeName}"`));
+    }
+    assert.match(badgeFixture, /html2canvas\(root,[\s\S]*?scale,/);
+    assert.match(badgeFixture, /dataset\.qaStatus = passed \? 'pass' : 'fail'/);
+    assert.doesNotMatch(badgeFixture, /report-badge-content|report-badge-label|normalizeReportBadges/);
 });
 
 test('ekspor PDF mempertahankan validasi dan merender tepat sembilan halaman dengan aman', () => {
