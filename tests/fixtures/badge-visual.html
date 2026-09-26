@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fixture Visual Badge PDF</title>
+    <style>
+        @font-face {
+            font-family: "Plus Jakarta Sans";
+            src: url("../../dist/assets/fonts/plus-jakarta-sans-latin-800-normal.woff2") format("woff2");
+            font-weight: 800;
+            font-style: normal;
+            font-display: block;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 24px;
+            color: #172033;
+            background: #f8fafc;
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        h1 { margin: 0 0 16px; font-size: 18px; }
+        #badgeFixture {
+            display: grid;
+            grid-template-columns: repeat(2, max-content);
+            gap: 12px 20px;
+            align-items: center;
+            width: max-content;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+        }
+        .fixture-label { font: 600 12px/1.3 "Plus Jakarta Sans", sans-serif; }
+        .report-badge,
+        .pdf-badge {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: auto !important;
+            vertical-align: middle !important;
+            text-align: center !important;
+            line-height: 1 !important;
+            font-weight: 800 !important;
+            white-space: nowrap !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }
+        .report-badge-compact {
+            height: 16px !important;
+            min-height: 16px !important;
+            padding: 0 8px !important;
+        }
+        .report-badge-header {
+            height: 24px !important;
+            min-height: 24px !important;
+            padding: 0 12px !important;
+        }
+        .pdf-badge {
+            height: 16px !important;
+            min-height: 16px !important;
+            padding: 0 8px !important;
+            border-radius: 6px !important;
+            font-size: 8px !important;
+            text-transform: uppercase !important;
+        }
+        .report-badge-content {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: inherit !important;
+            max-width: 100% !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            box-sizing: border-box !important;
+        }
+        .report-badge-label {
+            display: block !important;
+            line-height: inherit !important;
+        }
+        .purple { color: #fff; background: #9333ea; }
+        .blue { color: #fff; background: #2563eb; }
+        .green { color: #fff; background: #047857; }
+        .amber { color: #172033; background: #f2b705; }
+        .red { color: #fff; background: #dc2626; }
+        .header { color: #fde047; background: #b91c1c; border-radius: 8px; font-size: 9.5px; }
+        #rasterOutput { margin-top: 20px; }
+        #rasterOutput canvas { display: block; border: 1px solid #cbd5e1; }
+    </style>
+</head>
+<body class="export-capture">
+    <h1>Regresi visual badge - mode ekspor</h1>
+    <section id="badgeFixture" aria-label="Sampel badge PDF">
+        <span class="fixture-label">Status tertinggi</span>
+        <span class="pdf-badge purple"><span class="report-badge-content"><span class="report-badge-label">TERTINGGI</span></span></span>
+        <span class="fixture-label">Konsumsi baik</span>
+        <span class="pdf-badge blue"><span class="report-badge-content"><span class="report-badge-label">KONSUMSI BAIK</span></span></span>
+        <span class="fixture-label">Zero waste</span>
+        <span class="pdf-badge green"><span class="report-badge-content"><span class="report-badge-label">HABIS 100% (ZERO WASTE)</span></span></span>
+        <span class="fixture-label">Rasa buah</span>
+        <span class="pdf-badge green"><span class="report-badge-content"><span class="report-badge-label">MANIS</span></span></span>
+        <span class="fixture-label">Keyakinan analisis</span>
+        <span class="report-badge report-badge-compact green" style="font-size:8.5px;border-radius:999px"><span class="report-badge-content"><span class="report-badge-label">ANALISIS KUAT</span></span></span>
+        <span class="fixture-label">Peringatan</span>
+        <span class="report-badge report-badge-compact red" style="font-size:7.5px;border-radius:999px"><span class="report-badge-content"><span class="report-badge-label">Perhatian</span></span></span>
+        <span class="fixture-label">Persentase</span>
+        <span class="report-badge report-badge-compact amber" style="font-size:9px;border-radius:6px"><span class="report-badge-content"><span class="report-badge-label">9,93%</span></span></span>
+        <span class="fixture-label">Badge header</span>
+        <span class="report-badge report-badge-header header"><span class="report-badge-content"><span class="report-badge-label">SELASA, 22 SEPTEMBER 2026</span></span></span>
+    </section>
+    <section id="rasterOutput" aria-label="Hasil rasterisasi html2canvas"></section>
+    <script src="../../dist/assets/vendor/html2canvas-1.4.1.min.js"></script>
+    <script>
+        document.fonts.ready.then(async () => {
+            const canvas = await html2canvas(document.getElementById('badgeFixture'), {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                logging: false
+            });
+            document.getElementById('rasterOutput').appendChild(canvas);
+            const download = document.createElement('a');
+            download.id = 'downloadRaster';
+            download.href = canvas.toDataURL('image/png');
+            download.download = 'badge-raster-scale-2.png';
+            download.textContent = 'Unduh raster fixture';
+            document.getElementById('rasterOutput').appendChild(download);
+            document.body.dataset.rasterReady = 'true';
+        });
+    </script>
+</body>
+</html>

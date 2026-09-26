@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Generator Laporan Harian MBG - Versi 8.1.7</title>
+    <title>Sistem Generator Laporan Harian MBG - Versi 8.1.8</title>
     <meta name="description" content="Generator laporan harian MBG untuk SPPG Cilodong Sukamaju.">
     <meta name="robots" content="noindex,nofollow,noarchive">
     <meta name="referrer" content="no-referrer">
@@ -104,6 +104,22 @@
         [data-theme="amber"] .theme-bg-primary {
             color: var(--theme-on-primary) !important;
         }
+        [data-theme="amber"] :is(.theme-header, .theme-bg-primary) .text-white {
+            color: var(--theme-on-primary) !important;
+        }
+        [data-theme="amber"] :is(.theme-header, .theme-bg-primary) .text-white\/90 {
+            color: rgba(23, 32, 51, 0.9) !important;
+        }
+        [data-theme="amber"] :is(.theme-header, .theme-bg-primary) .text-white\/80 {
+            color: rgba(23, 32, 51, 0.8) !important;
+        }
+        [data-theme="amber"] :is(.theme-header, .theme-bg-primary) .text-white\/40 {
+            color: rgba(23, 32, 51, 0.55) !important;
+        }
+
+        @media (min-width: 1280px) {
+            #uiModeToggleLabel.hidden { display: inline-block !important; }
+        }
 
         .a4-page {
             width: 210mm;
@@ -152,35 +168,52 @@
             align-items: center !important;
             justify-content: center !important;
             width: auto !important;
-            height: auto !important;
             vertical-align: middle !important;
             text-align: center !important;
             line-height: 1 !important;
             font-weight: 800 !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
-            overflow: visible !important;
+            overflow: hidden !important;
         }
 
         .report-badge-compact {
+            height: 16px !important;
             min-height: 16px !important;
-            padding-top: 2px !important;
-            padding-bottom: 3px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
         }
 
         .report-badge-header {
+            height: 24px !important;
             min-height: 24px !important;
-            padding-top: 4px !important;
-            padding-bottom: 5px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
         }
 
         .pdf-badge {
-            display: inline-block !important;
+            height: 16px !important;
             min-height: 16px !important;
-            padding: 2px 8px 3px 8px !important;
+            padding: 0 8px !important;
             border-radius: 6px !important;
             font-size: 8px !important;
             text-transform: uppercase !important;
+        }
+
+        .report-badge-content {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: inherit !important;
+            max-width: 100% !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            box-sizing: border-box !important;
+        }
+
+        .report-badge-label {
+            display: block !important;
+            line-height: inherit !important;
         }
 
         .report-badge i {
@@ -691,7 +724,7 @@
                 <div>
                     <h1 class="text-sm font-black text-slate-900 tracking-tight flex items-center gap-1.5">
                         <span class="theme-text-primary">MBG DAILY REPORT</span>
-                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1.7</span>
+                        <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">VERSI 8.1.8</span>
                     </h1>
                     <p class="text-[11px] text-slate-500 font-medium disp-sppg-name">SPPG CILODONG SUKAMAJU 02 - YAYASAN BERKAH SITI ASMAH</p>
                 </div>
@@ -780,7 +813,7 @@
             </div>
 
             <details id="reportArchivePanel" open class="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1.7</summary>
+                <summary class="cursor-pointer text-xs font-black text-slate-800"><i class="fa-solid fa-folder-tree theme-text-primary mr-2"></i>Arsip Laporan V8.1.8</summary>
                 <div class="mt-3 space-y-2">
                     <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
                         <span class="text-[10px] font-bold text-slate-500 block">Laporan aktif</span>
@@ -896,7 +929,7 @@
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-bold text-slate-600 block mb-1 flex justify-between items-center">
+                    <label class="text-[11px] font-bold text-slate-600 mb-1 flex justify-between items-center">
                         <span>Tanggal Operasional Laporan</span>
                         <span id="calendarStatusBadge" class="text-[9px] bg-blue-50 text-blue-700 font-bold px-1.5 py-0.5 rounded flex items-center gap-1" role="status" aria-live="polite">
                             <i class="fa-regular fa-calendar-check text-[8px]"></i> Mengikuti Sistem
@@ -924,7 +957,7 @@
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-bold text-slate-600 block mb-1 flex justify-between items-center">
+                    <label class="text-[11px] font-bold text-slate-600 mb-1 flex justify-between items-center">
                         <span>Menu Utama (Halaman 1)</span>
                         <span class="text-[9px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded">Kategori Terkunci</span>
                     </label>
@@ -955,7 +988,7 @@
                 </div>
 
                 <div>
-                    <label class="text-[10.5px] font-bold text-slate-700 block mb-1 flex justify-between items-center">
+                    <label class="text-[10.5px] font-bold text-slate-700 mb-1 flex justify-between items-center">
                         <span>1. Kedatangan Bahan Baku (Pangan)</span>
                         <span id="badgeDateMaterials" class="locked-date-badge"><i class="fa-solid fa-lock" aria-hidden="true"></i> H-1</span>
                     </label>
@@ -963,7 +996,7 @@
                 </div>
 
                 <div>
-                    <label class="text-[10.5px] font-bold text-slate-700 block mb-1 flex justify-between items-center">
+                    <label class="text-[10.5px] font-bold text-slate-700 mb-1 flex justify-between items-center">
                         <span>2. Kesiapan Bahan Masak / Ready Stock</span>
                         <span class="text-[8.5px] bg-emerald-100 text-emerald-800 px-1 py-0.5 rounded font-mono font-bold">Grid Kartu Modern</span>
                     </label>
@@ -971,7 +1004,7 @@
                 </div>
 
                 <div>
-                    <label class="text-[10.5px] font-bold text-slate-700 block mb-1 flex justify-between items-center">
+                    <label class="text-[10.5px] font-bold text-slate-700 mb-1 flex justify-between items-center">
                         <span>3. Logistik Operasional Dapur</span>
                         <span class="text-[8.5px] bg-blue-100 text-blue-800 px-1 py-0.5 rounded font-mono font-bold">Dedikasi Terpisah</span>
                     </label>
@@ -980,7 +1013,7 @@
                 </div>
 
                 <div>
-                    <label class="text-[10.5px] font-bold text-slate-700 block mb-1 flex justify-between items-center">
+                    <label class="text-[10.5px] font-bold text-slate-700 mb-1 flex justify-between items-center">
                         <span>4. Laporan Kedatangan & Evaluasi Buah</span>
                         <span id="badgeDateFruit" class="locked-date-badge"><i class="fa-solid fa-lock" aria-hidden="true"></i> H-1</span>
                     </label>
@@ -1311,7 +1344,7 @@
                     <!-- AREA POSTER MENU -->
                     <div id="containerPosterMenu" class="grid grid-cols-2 gap-3 mb-1">
                         <div id="colPoster1" class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-slate-50 flex flex-col items-center justify-center relative group p-1 transition-all duration-200">
-                            <label class="cursor-pointer block relative w-full h-[178mm] max-h-[178mm] rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk mengganti Poster Menu MBG Sekolah">
+                            <label class="cursor-pointer relative w-full h-[178mm] max-h-[178mm] rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk mengganti Poster Menu MBG Sekolah">
                                 <img src="menu-mbg.png" alt="Poster Menu MBG Sekolah" class="poster-menu-mbg-img high-res-poster max-w-full max-h-[176mm] w-auto h-auto object-contain block mx-auto group-hover:opacity-95 transition">
                                 <div class="no-print absolute bottom-3 right-3 bg-black/75 hover:bg-black text-white text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1.5 pointer-events-none">
                                     <i class="fa-solid fa-camera"></i> Ganti Poster MBG
@@ -1321,7 +1354,7 @@
                         </div>
 
                         <div id="colPoster2" class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-slate-50 flex flex-col items-center justify-center relative group p-1 transition-all duration-200">
-                            <label class="cursor-pointer block relative w-full h-[178mm] max-h-[178mm] rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk mengganti Poster Menu Program B3">
+                            <label class="cursor-pointer relative w-full h-[178mm] max-h-[178mm] rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk mengganti Poster Menu Program B3">
                                 <img src="menu-b3.png" alt="Poster Menu Program B3 Posyandu" class="poster-menu-b3-img high-res-poster max-w-full max-h-[176mm] w-auto h-auto object-contain block mx-auto group-hover:opacity-95 transition">
                                 <div class="no-print absolute bottom-3 right-3 bg-black/75 hover:bg-black text-white text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1.5 pointer-events-none">
                                     <i class="fa-solid fa-camera"></i> Ganti Poster B3
@@ -1739,7 +1772,7 @@
                                 </p>
                             </div>
 
-                            <div class="bg-white border border-emerald-300 bg-emerald-50/30 rounded-lg p-2 flex flex-col justify-between shadow-2xs">
+                            <div class="border border-emerald-300 bg-emerald-50/30 rounded-lg p-2 flex flex-col justify-between shadow-2xs">
                                 <div>
                                     <div class="flex justify-between items-start mb-1">
                                         <span class="text-[8px] font-black text-emerald-800 uppercase tracking-wide">Peringkat 4</span>
@@ -2572,7 +2605,7 @@
                 // MODE 1: SINGLE POSTER LENGKAP VERTICAL
                 container.innerHTML = `
                     <div class="w-full h-[245mm] max-h-[245mm] border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-slate-50 flex items-center justify-center relative group p-1">
-                        <label class="cursor-pointer block relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk mengganti Poster ${sectionTitle}">
+                        <label class="cursor-pointer relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk mengganti Poster ${sectionTitle}">
                             <img src="${photos[0]}" alt="Poster ${sectionTitle}" class="high-res-poster max-w-full max-h-[244mm] w-auto h-auto object-contain block mx-auto group-hover:opacity-95 transition">
                             <div class="no-print absolute bottom-3 right-3 bg-black/75 hover:bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1.5 pointer-events-none">
                                 <i class="fa-solid fa-camera"></i> Ganti Poster Tunggal
@@ -2588,7 +2621,7 @@
                     const src = photos[i] || 'placeholder-persiapan.svg';
                     itemsHtml += `
                         <div class="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-slate-50 flex items-center justify-center relative group p-1 h-[120mm]">
-                            <label class="cursor-pointer block relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk ganti Foto ${i+1}">
+                            <label class="cursor-pointer relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-white" title="Klik untuk ganti Foto ${i+1}">
                                 <img src="${src}" alt="Foto ${i+1}" class="high-res-poster w-full h-full object-cover group-hover:scale-[1.02] transition duration-200">
                                 <span class="report-badge report-badge-compact absolute top-2 left-2 bg-slate-900/80 text-white text-[8px] px-2 rounded-md shadow-xs">
                                     Foto ${i+1}
@@ -2609,7 +2642,7 @@
                     const src = photos[i] || 'placeholder-persiapan.svg';
                     itemsHtml += `
                         <div class="border border-slate-200 rounded-lg overflow-hidden shadow-xs bg-slate-50 flex items-center justify-center relative group p-1 h-[79mm]">
-                            <label class="cursor-pointer block relative w-full h-full rounded-md overflow-hidden flex items-center justify-center bg-white" title="Klik untuk ganti Foto ${i+1}">
+                            <label class="cursor-pointer relative w-full h-full rounded-md overflow-hidden flex items-center justify-center bg-white" title="Klik untuk ganti Foto ${i+1}">
                                 <img src="${src}" alt="Foto ${i+1}" class="high-res-poster w-full h-full object-cover group-hover:scale-[1.02] transition duration-200">
                                 <span class="report-badge report-badge-compact absolute top-1.5 left-1.5 bg-slate-900/80 text-white text-[7.5px] px-1.5 rounded shadow-xs">
                                     Foto ${i+1}
@@ -3529,7 +3562,7 @@
                 Object.keys(localStorage).filter(key => key.startsWith('mbg_autosave_checkpoint_')).forEach(key => { checkpoints[key] = JSON.parse(localStorage.getItem(key)); });
                 const migrationSafety = localStorage.getItem(window.REPORT_MIGRATION_BACKUP_KEY);
                 const backup = {
-                    app: 'MBG Daily Report', version: '8.1.7', schemaVersion: 4, exportedAt: new Date().toISOString(),
+                    app: 'MBG Daily Report', version: '8.1.8', schemaVersion: 4, exportedAt: new Date().toISOString(),
                     currentSppgKey: window.currentSppgKey, currentReportId: window.currentReportId,
                     archive: window.reportArchive, checkpoints, assets,
                     migrationMetadata: window.reportArchive?.migration || null,
@@ -3538,7 +3571,7 @@
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `Backup MBG 8.1.7 - ${new Date().toISOString().slice(0, 10)}.json`;
+                link.download = `Backup MBG 8.1.8 - ${new Date().toISOString().slice(0, 10)}.json`;
                 document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
                 window.notifyUser('Backup JSON berhasil dibuat.', 'success');
             } catch (error) {
@@ -5942,6 +5975,7 @@
             window.checkPageOverflow();
             window.assessReportReadiness();
             window.renderValidationSummary();
+            window.normalizeReportBadges();
         };
 
         window.syncChangedData = function(sourceId) {
@@ -5961,6 +5995,7 @@
                 window.checkPageOverflow();
                 window.assessReportReadiness();
                 window.renderValidationSummary();
+                window.normalizeReportBadges();
             } catch (error) {
                 console.error('Sinkronisasi parsial gagal:', error);
                 window.notifyUser('Preview belum dapat diperbarui. Data ketikan sudah disimpan.', 'error');
@@ -6113,6 +6148,36 @@
             }));
         }
 
+        window.normalizeReportBadges = function(root = document) {
+            const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+            const badges = scope.querySelectorAll('.report-badge, .pdf-badge');
+
+            badges.forEach(badge => {
+                const onlyChild = badge.children.length === 1 ? badge.firstElementChild : null;
+                if (onlyChild?.classList.contains('report-badge-content') && badge.childNodes.length === 1) return;
+
+                const content = document.createElement('span');
+                content.className = 'report-badge-content';
+
+                Array.from(badge.childNodes).forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const text = String(node.textContent || '').replace(/\s+/g, ' ').trim();
+                        if (!text) return;
+                        const label = document.createElement('span');
+                        label.className = 'report-badge-label';
+                        label.textContent = text;
+                        content.appendChild(label);
+                        return;
+                    }
+                    if (node.nodeType === Node.ELEMENT_NODE) content.appendChild(node);
+                });
+
+                badge.replaceChildren(content);
+            });
+
+            return badges.length;
+        };
+
         /* GENERATE PDF ULTRA-HD DENGAN REKAYASA MEMORI KANVAS */
         window.generatePDF = async function() {
             const btn = document.getElementById('btnExportPDF');
@@ -6123,6 +6188,7 @@
             }
             window.syncData();
             if (!window.confirmValidationBeforeExport()) return;
+            window.normalizeReportBadges();
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Rendering PDF Ultra-HD...</span>';
@@ -6216,7 +6282,7 @@
             window.syncData();
             if (!window.confirmValidationBeforeExport()) return;
             const content = document.getElementById('previewStage').innerHTML;
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1.7</title></head><body>";
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Laporan Harian MBG v8.1.8</title></head><body>";
             const footer = "</body></html>";
             const sourceHTML = header + content + footer;
 
