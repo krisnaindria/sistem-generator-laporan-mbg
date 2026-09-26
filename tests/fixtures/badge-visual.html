@@ -207,9 +207,11 @@
                 let count = 0;
                 let minY = height;
                 let maxY = -1;
+                const scanStartX = Math.ceil(width * 0.2);
+                const scanEndX = Math.floor(width * 0.8);
 
                 for (let y = 0; y < height; y++) {
-                    for (let x = 0; x < width; x++) {
+                    for (let x = scanStartX; x < scanEndX; x++) {
                         const offset = (y * width + x) * 4;
                         if (!match(pixels[offset], pixels[offset + 1], pixels[offset + 2])) continue;
                         count++;
