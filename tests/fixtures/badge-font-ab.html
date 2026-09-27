@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>A/B Font Badge — Aplikasi Produksi</title>
+    <style>
+        :root { color-scheme: light; font-family: system-ui, sans-serif; }
+        * { box-sizing: border-box; }
+        body { margin: 0; color: #172033; background: #eef2f7; }
+        main { width: min(920px, calc(100% - 32px)); margin: 36px auto; }
+        h1 { margin: 0 0 8px; font-size: clamp(24px, 4vw, 36px); }
+        .lead { max-width: 760px; margin: 0 0 24px; color: #475569; line-height: 1.6; }
+        .notice { margin-bottom: 20px; padding: 14px 16px; border: 1px solid #bfdbfe; border-radius: 12px; background: #eff6ff; line-height: 1.5; }
+        .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        article { padding: 22px; border: 1px solid #cbd5e1; border-radius: 16px; background: #fff; box-shadow: 0 8px 28px rgba(15, 23, 42, .07); }
+        .label { display: inline-flex; margin-bottom: 10px; padding: 4px 9px; border-radius: 999px; color: #fff; background: #334155; font-size: 12px; font-weight: 800; }
+        article:last-child .label { background: #047857; }
+        h2 { margin: 0 0 8px; font-size: 20px; }
+        p { line-height: 1.55; }
+        a { display: inline-flex; margin-top: 8px; padding: 11px 15px; border-radius: 10px; color: #fff; background: #7e22ce; font-weight: 800; text-decoration: none; }
+        a:hover { background: #581c87; }
+        ol { margin: 24px 0 0; padding: 20px 20px 20px 42px; border-radius: 14px; background: #fff; line-height: 1.65; }
+        code { padding: 2px 5px; border-radius: 4px; background: #e2e8f0; }
+        @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Uji A/B font badge pada aplikasi lengkap</h1>
+        <p class="lead">Kedua pilihan memakai aplikasi produksi V8.1.9, data lokal yang sama, dan renderer PDF standar. Hanya pemuatan font badge yang dibedakan.</p>
+        <div class="notice"><strong>Aman:</strong> pengujian ini hanya berjalan di localhost. Berkas <code>dist/index.html</code> dan GitHub Pages tidak diubah.</div>
+
+        <section class="grid" aria-label="Pilihan pengujian A/B font badge">
+            <article>
+                <span class="label">A — KONTROL</span>
+                <h2>Konfigurasi produksi</h2>
+                <p>Font badge mengikuti <code>font-display: swap</code> dari stylesheet produksi saat ini.</p>
+                <a href="/badge-font-ab/control/index.html">Buka kontrol A</a>
+            </article>
+            <article>
+                <span class="label">B — KANDIDAT</span>
+                <h2>Font badge stabil</h2>
+                <p>Badge memakai alias font 800 yang sama dengan <code>font-display: block</code>. Tata letak dan renderer tidak berubah.</p>
+                <a href="/badge-font-ab/candidate/index.html">Buka kandidat B</a>
+            </article>
+        </section>
+
+        <ol>
+            <li>Buka A, tunggu laporan selesai dimuat, lalu unduh PDF dan beri nama <code>A-kontrol.pdf</code>.</li>
+            <li>Kembali ke halaman ini, buka B, lalu unduh PDF dengan data yang sama dan beri nama <code>B-font-stabil.pdf</code>.</li>
+            <li>Jangan mengedit data di antara ekspor A dan B. Unggah kedua PDF untuk dibandingkan.</li>
+        </ol>
+    </main>
+</body>
+</html>

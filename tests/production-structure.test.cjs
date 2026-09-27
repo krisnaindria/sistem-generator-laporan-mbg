@@ -6,6 +6,8 @@ const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '..', 'dist', 'index.html'), 'utf8');
 const coreSource = fs.readFileSync(path.join(__dirname, '..', 'dist', 'assets', 'mbg-core.js'), 'utf8');
 const badgeFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'badge-visual.html'), 'utf8');
+const badgeFontFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'badge-font-ab.html'), 'utf8');
+const badgeAbServer = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'serve-badge-ab.cjs'), 'utf8');
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 
 test('dokumen memiliki bahasa, skip link, dan landmark utama', () => {
@@ -299,6 +301,21 @@ test('fixture badge menguji A/B renderer dalam konteks tabel, kartu, ikon, heade
     assert.match(badgeFixture, /productionRendererUnchanged: true/);
     assert.match(badgeFixture, /dataset\.abVerdict = verdict/);
     assert.doesNotMatch(badgeFixture, /report-badge-content|report-badge-label|normalizeReportBadges/);
+});
+
+test('A/B font badge memakai aplikasi produksi lengkap tanpa mengubah dist atau renderer default', () => {
+    assert.equal(packageJson.scripts['test:badge-font-ab'], 'node scripts/serve-badge-ab.cjs');
+    assert.match(badgeFontFixture, /href="\/badge-font-ab\/control\/index\.html"/);
+    assert.match(badgeFontFixture, /href="\/badge-font-ab\/candidate\/index\.html"/);
+    assert.match(badgeFontFixture, /renderer PDF standar/);
+    assert.match(badgeAbServer, /const controlPrefix = '\/badge-font-ab\/control';/);
+    assert.match(badgeAbServer, /const candidatePrefix = '\/badge-font-ab\/candidate';/);
+    assert.match(badgeAbServer, /id="badge-font-ab-candidate"/);
+    assert.match(badgeAbServer, /font-family: "Plus Jakarta Sans Badge Stable";/);
+    assert.match(badgeAbServer, /plus-jakarta-sans-latin-800-normal\.woff2/);
+    assert.match(badgeAbServer, /font-display: block;/);
+    assert.doesNotMatch(badgeAbServer, /foreignObjectRendering/);
+    assert.doesNotMatch(html, /Plus Jakarta Sans Badge Stable|badge-font-ab-candidate/);
 });
 
 test('ekspor PDF mempertahankan validasi dan merender tepat sembilan halaman dengan aman', () => {

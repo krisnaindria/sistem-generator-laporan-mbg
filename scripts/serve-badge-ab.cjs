@@ -5,7 +5,13 @@ const http = require('node:http');
 const path = require('node:path');
 
 const repositoryRoot = path.resolve(__dirname, '..');
-const fixturePath = '/tests/fixtures/badge-visual.html';
+const rendererFixturePath = '/tests/fixtures/badge-visual.html';
+const fontFixturePath = '/tests/fixtures/badge-font-ab.html';
+const controlPrefix = '/badge-font-ab/control';
+const candidatePrefix = '/badge-font-ab/candidate';
+const distRoot = path.resolve(repositoryRoot, 'dist');
+const fixtureRoot = path.resolve(repositoryRoot, 'tests', 'fixtures');
+const productionHtmlPath = path.join(distRoot, 'index.html');
 const requestedPort = Number.parseInt(process.env.MBG_BADGE_AB_PORT || '4173', 10);
 
 if (!Number.isInteger(requestedPort) || requestedPort < 1 || requestedPort > 65535) {
@@ -15,49 +21,66 @@ if (!Number.isInteger(requestedPort) || requestedPort < 1 || requestedPort > 655
 const contentTypes = new Map([
     ['.css', 'text/css; charset=utf-8'],
     ['.html', 'text/html; charset=utf-8'],
+    ['.ico', 'image/x-icon'],
+    ['.jpeg', 'image/jpeg'],
+    ['.jpg', 'image/jpeg'],
     ['.js', 'text/javascript; charset=utf-8'],
+    ['.json', 'application/json; charset=utf-8'],
     ['.png', 'image/png'],
     ['.svg', 'image/svg+xml; charset=utf-8'],
+    ['.webp', 'image/webp'],
     ['.woff2', 'font/woff2']
 ]);
 
-const server = http.createServer((request, response) => {
-    if (request.method !== 'GET' && request.method !== 'HEAD') {
-        response.writeHead(405, { Allow: 'GET, HEAD' });
-        response.end('Method Not Allowed');
-        return;
-    }
+const badgeFontCandidateInjection = `
+    <!-- Eksperimen lokal A/B font badge; tidak terdapat pada dist produksi. -->
+    <link rel="preload" href="assets/fonts/plus-jakarta-sans-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <style id="badge-font-ab-candidate">
+        @font-face {
+            font-family: "Plus Jakarta Sans Badge Stable";
+            src: url("assets/fonts/plus-jakarta-sans-latin-800-normal.woff2") format("woff2");
+            font-style: normal;
+            font-weight: 800;
+            font-display: block;
+        }
 
-    let pathname;
-    try {
-        const requestUrl = new URL(request.url || '/', 'http://127.0.0.1');
-        pathname = decodeURIComponent(requestUrl.pathname);
-    } catch (error) {
-        response.writeHead(400);
-        response.end('Bad Request');
-        return;
-    }
+        .report-badge,
+        .pdf-badge {
+            font-family: "Plus Jakarta Sans Badge Stable", "Plus Jakarta Sans", sans-serif !important;
+        }
+    </style>
+`;
 
-    if (pathname === '/') {
-        response.writeHead(302, { Location: fixturePath });
-        response.end();
-        return;
-    }
+const productionHtml = fs.readFileSync(productionHtmlPath, 'utf8');
+const candidateHtml = productionHtml
+    .replace(
+        /<title>[^<]*<\/title>/,
+        '<title>B — Uji Font Badge Stabil | Sistem Generator Laporan MBG</title>'
+    )
+    .replace('</head>', `${badgeFontCandidateInjection}</head>`);
 
-    if (pathname !== fixturePath && !pathname.startsWith('/dist/')) {
-        response.writeHead(404);
-        response.end('Not Found');
-        return;
-    }
+if (
+    candidateHtml === productionHtml
+    || !candidateHtml.includes('badge-font-ab-candidate')
+    || !candidateHtml.includes('<title>B — Uji Font Badge Stabil')
+) {
+    throw new Error('Gagal menyiapkan kandidat A/B font badge dari dist/index.html.');
+}
 
-    const filePath = path.resolve(repositoryRoot, `.${pathname}`);
-    const allowedRoots = [
-        path.resolve(repositoryRoot, 'dist'),
-        path.resolve(repositoryRoot, 'tests', 'fixtures')
-    ];
-    const isAllowed = allowedRoots.some(root => filePath === root || filePath.startsWith(`${root}${path.sep}`));
+const isInside = (filePath, root) => filePath === root || filePath.startsWith(`${root}${path.sep}`);
 
-    if (!isAllowed) {
+const sendBuffer = (request, response, statusCode, body, contentType) => {
+    const payload = Buffer.isBuffer(body) ? body : Buffer.from(body);
+    response.writeHead(statusCode, {
+        'Cache-Control': 'no-store',
+        'Content-Length': payload.length,
+        'Content-Type': contentType
+    });
+    response.end(request.method === 'HEAD' ? undefined : payload);
+};
+
+const sendFile = (request, response, filePath, allowedRoot) => {
+    if (!isInside(filePath, allowedRoot)) {
         response.writeHead(403);
         response.end('Forbidden');
         return;
@@ -84,10 +107,85 @@ const server = http.createServer((request, response) => {
         stream.on('error', () => response.destroy());
         stream.pipe(response);
     });
+};
+
+const resolveProductionRoute = (pathname, prefix) => {
+    if (pathname === prefix) return { redirect: `${prefix}/index.html` };
+
+    const prefixWithSlash = `${prefix}/`;
+    if (!pathname.startsWith(prefixWithSlash)) return null;
+
+    const relativePath = pathname.slice(prefixWithSlash.length) || 'index.html';
+    const filePath = path.resolve(distRoot, relativePath);
+    if (!isInside(filePath, distRoot)) return { forbidden: true };
+
+    return { filePath, isIndex: relativePath === 'index.html' };
+};
+
+const server = http.createServer((request, response) => {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+        response.writeHead(405, { Allow: 'GET, HEAD' });
+        response.end('Method Not Allowed');
+        return;
+    }
+
+    let pathname;
+    try {
+        const requestUrl = new URL(request.url || '/', 'http://127.0.0.1');
+        pathname = decodeURIComponent(requestUrl.pathname);
+    } catch (error) {
+        response.writeHead(400);
+        response.end('Bad Request');
+        return;
+    }
+
+    if (pathname === '/') {
+        response.writeHead(302, { Location: rendererFixturePath });
+        response.end();
+        return;
+    }
+
+    const controlRoute = resolveProductionRoute(pathname, controlPrefix);
+    const candidateRoute = resolveProductionRoute(pathname, candidatePrefix);
+    const productionRoute = controlRoute || candidateRoute;
+
+    if (productionRoute) {
+        if (productionRoute.redirect) {
+            response.writeHead(302, { Location: productionRoute.redirect });
+            response.end();
+            return;
+        }
+        if (productionRoute.forbidden) {
+            response.writeHead(403);
+            response.end('Forbidden');
+            return;
+        }
+        if (candidateRoute?.isIndex) {
+            sendBuffer(request, response, 200, candidateHtml, 'text/html; charset=utf-8');
+            return;
+        }
+
+        sendFile(request, response, productionRoute.filePath, distRoot);
+        return;
+    }
+
+    if (pathname === rendererFixturePath || pathname === fontFixturePath) {
+        sendFile(request, response, path.resolve(repositoryRoot, `.${pathname}`), fixtureRoot);
+        return;
+    }
+
+    if (pathname.startsWith('/dist/')) {
+        sendFile(request, response, path.resolve(repositoryRoot, `.${pathname}`), distRoot);
+        return;
+    }
+
+    response.writeHead(404);
+    response.end('Not Found');
 });
 
 server.listen(requestedPort, '127.0.0.1', () => {
-    console.log(`A/B badge fixture: http://127.0.0.1:${requestedPort}${fixturePath}`);
+    console.log(`A/B renderer badge: http://127.0.0.1:${requestedPort}${rendererFixturePath}`);
+    console.log(`A/B font badge produksi: http://127.0.0.1:${requestedPort}${fontFixturePath}`);
     console.log('Tekan Ctrl+C untuk menghentikan server lokal.');
 });
 
