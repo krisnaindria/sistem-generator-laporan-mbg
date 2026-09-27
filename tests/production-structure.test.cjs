@@ -281,13 +281,23 @@ test('badge laporan memakai metrik font yang aman untuk ekspor PDF', () => {
     assert.match(html, /badgeEl\.className = `report-badge report-badge-compact/);
 });
 
-test('fixture badge menguji konteks tabel, kartu, ikon, header, dan raster skala dua', () => {
+test('fixture badge menguji A/B renderer dalam konteks tabel, kartu, ikon, header, dan raster skala dua', () => {
+    assert.equal(packageJson.scripts['test:badge-ab'], 'node scripts/serve-badge-ab.cjs');
     assert.match(badgeFixture, /<table aria-label="Status daya terima">/);
     for (const badgeName of ['tanggal', 'manis', 'tertinggi', 'konsumsi', 'zero-waste', 'analisis', 'perhatian', 'qc']) {
         assert.match(badgeFixture, new RegExp(`data-qa="${badgeName}"`));
     }
+    assert.match(badgeFixture, /plus-jakarta-sans-latin-400-normal\.woff2/);
+    assert.match(badgeFixture, /plus-jakarta-sans-latin-800-normal\.woff2/);
+    assert.match(badgeFixture, /data-qa-icon="qc-icon"/);
+    assert.match(badgeFixture, /data-qa-image="logo-bgn"/);
     assert.match(badgeFixture, /html2canvas\(root,[\s\S]*?scale,/);
-    assert.match(badgeFixture, /dataset\.qaStatus = passed \? 'pass' : 'fail'/);
+    assert.match(badgeFixture, /foreignObjectRendering: false/);
+    assert.match(badgeFixture, /foreignObjectRendering: true/);
+    assert.match(badgeFixture, /rasterOutputStandard/);
+    assert.match(badgeFixture, /rasterOutputForeign/);
+    assert.match(badgeFixture, /productionRendererUnchanged: true/);
+    assert.match(badgeFixture, /dataset\.abVerdict = verdict/);
     assert.doesNotMatch(badgeFixture, /report-badge-content|report-badge-label|normalizeReportBadges/);
 });
 
@@ -299,6 +309,7 @@ test('ekspor PDF mempertahankan validasi dan merender tepat sembilan halaman den
     assert.match(html, /const pages = Array\.from\(document\.querySelectorAll\('\.a4-page'\)\);/);
     assert.match(html, /if \(pages\.length !== 9\)/);
     assert.match(html, /allowTaint: false/);
+    assert.doesNotMatch(html, /foreignObjectRendering/);
     assert.match(html, /canvas\.width <= 0 \|\| canvas\.height <= 0/);
     assert.match(html, /if \(renderedPagesCount !== 9\)/);
 });
