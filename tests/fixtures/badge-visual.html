@@ -3,8 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fixture Konteks Badge PDF</title>
+    <title>Fixture A/B Renderer Badge PDF</title>
+    <link rel="stylesheet" href="../../dist/assets/fontawesome/css/all.min.css">
     <style>
+        @font-face {
+            font-family: "Plus Jakarta Sans";
+            src: url("../../dist/assets/fonts/plus-jakarta-sans-latin-400-normal.woff2") format("woff2");
+            font-weight: 400;
+            font-style: normal;
+            font-display: block;
+        }
+
         @font-face {
             font-family: "Plus Jakarta Sans";
             src: url("../../dist/assets/fonts/plus-jakarta-sans-latin-800-normal.woff2") format("woff2");
@@ -19,6 +28,7 @@
             color: #172033;
             background: #e2e8f0;
             font-family: "Plus Jakarta Sans", sans-serif;
+            font-weight: 400;
         }
         h1 { margin: 0 0 16px; font-size: 18px; }
         #badgeFixture {
@@ -123,13 +133,18 @@
         }
         .compact-badge { padding-left: 10px; padding-right: 10px; border-radius: 999px; font-size: 8.5px; }
         .icon-badge { padding-left: 8px; padding-right: 8px; border-radius: 6px; font-size: 8px; gap: 4px; }
-        #rasterOutput { margin-top: 20px; padding: 8px; background: #fff; }
-        #rasterOutput canvas { display: block; width: 794px; height: auto; border: 1px solid #cbd5e1; }
+        .asset-check { width: 56px; height: 36px; object-fit: contain; }
+        #rasterOutput { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+        .raster-panel { min-width: 0; padding: 8px; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .raster-panel h2 { margin: 0 0 8px; font-size: 13px; }
+        .raster-panel canvas { display: block; width: 100%; height: auto; border: 1px solid #cbd5e1; }
         #qaResult { margin-top: 12px; padding: 12px; background: #0f172a; color: #e2e8f0; font: 12px/1.5 monospace; white-space: pre-wrap; }
+        #abSummary { margin-top: 12px; padding: 10px 12px; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 800; }
+        @media (max-width: 1100px) { #rasterOutput { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="export-capture">
-    <h1>Regresi visual badge - konteks A4 dan tabel</h1>
+    <h1>Pengujian A/B badge - renderer standar vs foreignObject</h1>
     <section id="badgeFixture" aria-label="Sampel badge PDF dalam konteks laporan">
         <div class="fixture-header">
             <strong>KEDATANGAN BAHAN BAKU & KESIAPAN DAPUR</strong>
@@ -158,12 +173,23 @@
             </div>
             <div class="badge-row">
                 <span class="report-badge report-badge-compact compact-badge red" data-qa="perhatian" data-ink="light">Perhatian</span>
-                <span class="report-badge report-badge-compact icon-badge amber" data-qa="qc" data-ink="dark"><i aria-hidden="true">✓</i> QC PASSED</span>
+                <span class="report-badge report-badge-compact icon-badge amber" data-qa="qc" data-ink="dark"><i class="fa-solid fa-circle-check" data-qa-icon="qc-icon" aria-hidden="true"></i> QC PASSED</span>
+                <img class="asset-check" data-qa-image="logo-bgn" src="../../dist/logo-bgn.png" alt="Logo BGN untuk pemeriksaan aset">
             </div>
         </div>
     </section>
 
-    <section id="rasterOutput" aria-label="Hasil rasterisasi html2canvas"></section>
+    <div id="abSummary" role="status" aria-live="polite">Menunggu kedua renderer...</div>
+    <section id="rasterOutput" aria-label="Perbandingan hasil rasterisasi html2canvas">
+        <article class="raster-panel">
+            <h2>A - Renderer standar (kontrol produksi)</h2>
+            <div id="rasterOutputStandard"></div>
+        </article>
+        <article class="raster-panel">
+            <h2>B - foreignObjectRendering (kandidat eksperimental)</h2>
+            <div id="rasterOutputForeign"></div>
+        </article>
+    </section>
     <pre id="qaResult" aria-live="polite">Menunggu rasterisasi...</pre>
     <script src="../../dist/assets/vendor/html2canvas-1.4.1.min.js"></script>
     <script>
@@ -173,31 +199,9 @@
             dark: (r, g, b) => r < 95 && g < 125 && b < 140
         };
 
-        document.fonts.ready.then(async () => {
-            const root = document.getElementById('badgeFixture');
-            const rootRect = root.getBoundingClientRect();
-            const badgeRects = Array.from(root.querySelectorAll('[data-qa]')).map(element => {
-                const rect = element.getBoundingClientRect();
-                return {
-                    name: element.dataset.qa,
-                    ink: element.dataset.ink,
-                    x: rect.left - rootRect.left,
-                    y: rect.top - rootRect.top,
-                    width: rect.width,
-                    height: rect.height
-                };
-            });
-
-            const scale = 2;
-            const canvas = await html2canvas(root, {
-                scale,
-                backgroundColor: '#ffffff',
-                logging: false
-            });
-            document.getElementById('rasterOutput').appendChild(canvas);
-
+        const auditBadgeRaster = (canvas, badgeRects, iconRects, imageRects, scale) => {
             const context = canvas.getContext('2d', { willReadFrequently: true });
-            const results = badgeRects.map(rect => {
+            const badges = badgeRects.map(rect => {
                 const x0 = Math.round((rect.x + 2) * scale);
                 const y0 = Math.round((rect.y + 1) * scale);
                 const width = Math.max(1, Math.round((rect.width - 4) * scale));
@@ -228,10 +232,133 @@
                 return { name: rect.name, passed, count, clipped, centerDelta };
             });
 
-            const passed = results.every(result => result.passed);
+            const icons = iconRects.map(rect => {
+                const x0 = Math.max(0, Math.floor(rect.x * scale));
+                const y0 = Math.max(0, Math.floor(rect.y * scale));
+                const width = Math.max(1, Math.ceil(rect.width * scale));
+                const height = Math.max(1, Math.ceil(rect.height * scale));
+                const pixels = context.getImageData(x0, y0, width, height).data;
+                let inkPixels = 0;
+                for (let i = 0; i < pixels.length; i += 4) {
+                    if (inkMatches.dark(pixels[i], pixels[i + 1], pixels[i + 2]) && pixels[i + 3] > 0) inkPixels++;
+                }
+                return { name: rect.name, passed: inkPixels >= 8, inkPixels };
+            });
+
+            const images = imageRects.map(rect => {
+                const x0 = Math.max(0, Math.floor(rect.x * scale));
+                const y0 = Math.max(0, Math.floor(rect.y * scale));
+                const width = Math.max(1, Math.ceil(rect.width * scale));
+                const height = Math.max(1, Math.ceil(rect.height * scale));
+                const pixels = context.getImageData(x0, y0, width, height).data;
+                let coloredPixels = 0;
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const nearWhite = pixels[i] > 245 && pixels[i + 1] > 245 && pixels[i + 2] > 245;
+                    if (!nearWhite && pixels[i + 3] > 20) coloredPixels++;
+                }
+                return { name: rect.name, passed: coloredPixels >= 40, coloredPixels };
+            });
+
+            const validDeltas = badges.map(result => result.centerDelta).filter(Number.isFinite);
+            const meanAbsoluteDelta = validDeltas.length
+                ? validDeltas.reduce((sum, value) => sum + Math.abs(value), 0) / validDeltas.length
+                : null;
+            const passed = badges.every(result => result.passed)
+                && icons.every(result => result.passed)
+                && images.every(result => result.passed);
+            return { passed, meanAbsoluteDelta, badges, icons, images };
+        };
+
+        document.fonts.ready.then(async () => {
+            const root = document.getElementById('badgeFixture');
+            const rootRect = root.getBoundingClientRect();
+            const badgeRects = Array.from(root.querySelectorAll('[data-qa]')).map(element => {
+                const rect = element.getBoundingClientRect();
+                return {
+                    name: element.dataset.qa,
+                    ink: element.dataset.ink,
+                    x: rect.left - rootRect.left,
+                    y: rect.top - rootRect.top,
+                    width: rect.width,
+                    height: rect.height
+                };
+            });
+            const iconRects = Array.from(root.querySelectorAll('[data-qa-icon]')).map(element => {
+                const rect = element.getBoundingClientRect();
+                return {
+                    name: element.dataset.qaIcon,
+                    x: rect.left - rootRect.left,
+                    y: rect.top - rootRect.top,
+                    width: rect.width,
+                    height: rect.height
+                };
+            });
+            const imageRects = Array.from(root.querySelectorAll('[data-qa-image]')).map(element => {
+                const rect = element.getBoundingClientRect();
+                return {
+                    name: element.dataset.qaImage,
+                    x: rect.left - rootRect.left,
+                    y: rect.top - rootRect.top,
+                    width: rect.width,
+                    height: rect.height
+                };
+            });
+
+            const scale = 2;
+            const rendererCases = [
+                { key: 'standard', outputId: 'rasterOutputStandard', foreignObjectRendering: false },
+                { key: 'foreign', outputId: 'rasterOutputForeign', foreignObjectRendering: true }
+            ];
+            const reports = {};
+
+            for (const rendererCase of rendererCases) {
+                const startedAt = performance.now();
+                try {
+                    const canvas = await html2canvas(root, {
+                        scale,
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        foreignObjectRendering: rendererCase.foreignObjectRendering
+                    });
+                    document.getElementById(rendererCase.outputId).appendChild(canvas);
+                    reports[rendererCase.key] = {
+                        renderer: rendererCase.key,
+                        durationMs: Math.round(performance.now() - startedAt),
+                        canvas: { width: canvas.width, height: canvas.height },
+                        ...auditBadgeRaster(canvas, badgeRects, iconRects, imageRects, scale)
+                    };
+                } catch (error) {
+                    reports[rendererCase.key] = {
+                        renderer: rendererCase.key,
+                        passed: false,
+                        durationMs: Math.round(performance.now() - startedAt),
+                        error: error instanceof Error ? error.message : String(error)
+                    };
+                }
+            }
+
+            const standardDelta = reports.standard?.meanAbsoluteDelta;
+            const foreignDelta = reports.foreign?.meanAbsoluteDelta;
+            let verdict = 'inconclusive';
+            if (reports.foreign?.passed && Number.isFinite(standardDelta) && Number.isFinite(foreignDelta)) {
+                if (foreignDelta + 0.25 < standardDelta) verdict = 'foreign-better';
+                else if (standardDelta + 0.25 < foreignDelta) verdict = 'standard-better';
+                else verdict = 'equivalent';
+            } else if (reports.standard?.passed && !reports.foreign?.passed) {
+                verdict = 'standard-safer';
+            }
+
+            const result = { verdict, productionRendererUnchanged: true, reports };
+            window.__badgeRendererAbResult = result;
             document.body.dataset.rasterReady = 'true';
-            document.body.dataset.qaStatus = passed ? 'pass' : 'fail';
-            document.getElementById('qaResult').textContent = JSON.stringify({ passed, results }, null, 2);
+            document.body.dataset.qaStatus = reports.standard?.passed ? 'pass' : 'fail';
+            document.body.dataset.standardStatus = reports.standard?.passed ? 'pass' : 'fail';
+            document.body.dataset.foreignStatus = reports.foreign?.passed ? 'pass' : 'fail';
+            document.body.dataset.abVerdict = verdict;
+            document.getElementById('abSummary').textContent = `Verdict: ${verdict} | standar ${reports.standard?.durationMs ?? '-'} ms | foreignObject ${reports.foreign?.durationMs ?? '-'} ms`;
+            document.getElementById('qaResult').textContent = JSON.stringify(result, null, 2);
         });
     </script>
 </body>
