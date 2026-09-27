@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build:assets": "tailwindcss -i src/tailwind.css -o dist/assets/app.css --minify --content dist/index.html && node scripts/copy-vendor.cjs",
-    "test": "node --test tests/*.test.cjs"
+    "test": "node --test tests/*.test.cjs",
+    "test:badge-ab": "node scripts/serve-badge-ab.cjs"
   },
   "devDependencies": {
     "@fontsource/plus-jakarta-sans": "5.2.8",
