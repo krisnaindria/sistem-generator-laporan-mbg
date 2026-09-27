@@ -6,7 +6,7 @@ const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '..', 'dist', 'index.html'), 'utf8');
 const coreSource = fs.readFileSync(path.join(__dirname, '..', 'dist', 'assets', 'mbg-core.js'), 'utf8');
 const badgeFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'badge-visual.html'), 'utf8');
-const badgeFontFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'badge-font-ab.html'), 'utf8');
+const badgeBaselineFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'badge-baseline-ab.html'), 'utf8');
 const badgeAbServer = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'serve-badge-ab.cjs'), 'utf8');
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 
@@ -303,19 +303,28 @@ test('fixture badge menguji A/B renderer dalam konteks tabel, kartu, ikon, heade
     assert.doesNotMatch(badgeFixture, /report-badge-content|report-badge-label|normalizeReportBadges/);
 });
 
-test('A/B font badge memakai aplikasi produksi lengkap tanpa mengubah dist atau renderer default', () => {
-    assert.equal(packageJson.scripts['test:badge-font-ab'], 'node scripts/serve-badge-ab.cjs');
-    assert.match(badgeFontFixture, /href="\/badge-font-ab\/control\/index\.html"/);
-    assert.match(badgeFontFixture, /href="\/badge-font-ab\/candidate\/index\.html"/);
-    assert.match(badgeFontFixture, /renderer PDF standar/);
-    assert.match(badgeAbServer, /const controlPrefix = '\/badge-font-ab\/control';/);
-    assert.match(badgeAbServer, /const candidatePrefix = '\/badge-font-ab\/candidate';/);
-    assert.match(badgeAbServer, /id="badge-font-ab-candidate"/);
-    assert.match(badgeAbServer, /font-family: "Plus Jakarta Sans Badge Stable";/);
-    assert.match(badgeAbServer, /plus-jakarta-sans-latin-800-normal\.woff2/);
-    assert.match(badgeAbServer, /font-display: block;/);
+test('A/B baseline badge memakai aplikasi produksi lengkap dan hanya mengubah DOM clone kandidat', () => {
+    assert.equal(packageJson.scripts['test:badge-baseline-ab'], 'node scripts/serve-badge-ab.cjs');
+    assert.equal(packageJson.scripts['test:badge-font-ab'], undefined);
+    assert.match(badgeBaselineFixture, /href="\/badge-baseline-ab\/control\/index\.html"/);
+    assert.match(badgeBaselineFixture, /href="\/badge-baseline-ab\/candidate\/index\.html"/);
+    assert.match(badgeBaselineFixture, /renderer PDF standar/);
+    assert.match(badgeBaselineFixture, /DOM clone/);
+    assert.match(badgeBaselineFixture, /B-baseline-clone\.pdf/);
+    assert.match(badgeAbServer, /const controlPrefix = '\/badge-baseline-ab\/control';/);
+    assert.match(badgeAbServer, /const candidatePrefix = '\/badge-baseline-ab\/candidate';/);
+    assert.match(badgeAbServer, /id="badge-baseline-ab-candidate"/);
+    assert.match(badgeAbServer, /id="badge-baseline-ab-hook"/);
+    assert.match(badgeAbServer, /className = 'badge-export-content'/);
+    assert.match(badgeAbServer, /transform: translateY\(-4\.5px\) !important;/);
+    assert.match(badgeAbServer, /const upstreamOnclone = options\.onclone;/);
+    assert.match(badgeAbServer, /typeof upstreamOnclone === 'function'/);
+    assert.match(badgeAbServer, /await upstreamOnclone\(clonedDocument, clonedElement\);/);
+    assert.match(badgeAbServer, /querySelectorAll\('\.a4-page \.report-badge, \.a4-page \.pdf-badge'\)/);
+    assert.doesNotMatch(badgeAbServer, /Plus Jakarta Sans Badge Stable|font-display: block;/);
     assert.doesNotMatch(badgeAbServer, /foreignObjectRendering/);
-    assert.doesNotMatch(html, /Plus Jakarta Sans Badge Stable|badge-font-ab-candidate/);
+    assert.doesNotMatch(html, /badge-baseline-ab-(?:candidate|hook)|badge-export-content|translateY\(-4\.5px\)/);
+    assert.equal(fs.existsSync(path.join(__dirname, 'fixtures', 'badge-font-ab.html')), false);
 });
 
 test('ekspor PDF mempertahankan validasi dan merender tepat sembilan halaman dengan aman', () => {

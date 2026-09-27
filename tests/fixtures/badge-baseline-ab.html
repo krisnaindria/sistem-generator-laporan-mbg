@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>A/B Font Badge — Aplikasi Produksi</title>
+    <title>A/B Baseline Badge — Aplikasi Produksi</title>
     <style>
         :root { color-scheme: light; font-family: system-ui, sans-serif; }
         * { box-sizing: border-box; }
@@ -27,29 +27,29 @@
 </head>
 <body>
     <main>
-        <h1>Uji A/B font badge pada aplikasi lengkap</h1>
-        <p class="lead">Kedua pilihan memakai aplikasi produksi V8.1.9, data lokal yang sama, dan renderer PDF standar. Hanya pemuatan font badge yang dibedakan.</p>
-        <div class="notice"><strong>Aman:</strong> pengujian ini hanya berjalan di localhost. Berkas <code>dist/index.html</code> dan GitHub Pages tidak diubah.</div>
+        <h1>Uji A/B baseline badge pada aplikasi lengkap</h1>
+        <p class="lead">Kedua pilihan memakai aplikasi produksi V8.1.9, data lokal yang sama, font yang sama, dan renderer PDF standar. Kandidat hanya menggeser isi badge pada salinan DOM yang diraster.</p>
+        <div class="notice"><strong>Aman:</strong> pengujian ini hanya berjalan di localhost. Tampilan aplikasi aktif, berkas <code>dist/index.html</code>, dan GitHub Pages tidak diubah.</div>
 
-        <section class="grid" aria-label="Pilihan pengujian A/B font badge">
+        <section class="grid" aria-label="Pilihan pengujian A/B baseline badge">
             <article>
                 <span class="label">A — KONTROL</span>
-                <h2>Konfigurasi produksi</h2>
-                <p>Font badge mengikuti <code>font-display: swap</code> dari stylesheet produksi saat ini.</p>
-                <a href="/badge-font-ab/control/index.html">Buka kontrol A</a>
+                <h2>Produksi tanpa perubahan</h2>
+                <p>Ekspor memakai konfigurasi V8.1.9 persis seperti produksi saat ini.</p>
+                <a href="/badge-baseline-ab/control/index.html">Buka kontrol A</a>
             </article>
             <article>
                 <span class="label">B — KANDIDAT</span>
-                <h2>Font badge stabil</h2>
-                <p>Badge memakai alias font 800 yang sama dengan <code>font-display: block</code>. Tata letak dan renderer tidak berubah.</p>
-                <a href="/badge-font-ab/candidate/index.html">Buka kandidat B</a>
+                <h2>Kompensasi baseline clone-only</h2>
+                <p>Saat ekspor saja, isi setiap badge pada DOM clone dibungkus lalu digeser <code>-4.5px</code>. Latar, ukuran, dan posisi wadah badge tetap.</p>
+                <a href="/badge-baseline-ab/candidate/index.html">Buka kandidat B</a>
             </article>
         </section>
 
         <ol>
             <li>Buka A, tunggu laporan selesai dimuat, lalu unduh PDF dan beri nama <code>A-kontrol.pdf</code>.</li>
-            <li>Kembali ke halaman ini, buka B, lalu unduh PDF dengan data yang sama dan beri nama <code>B-font-stabil.pdf</code>.</li>
-            <li>Jangan mengedit data di antara ekspor A dan B. Unggah kedua PDF untuk dibandingkan.</li>
+            <li>Kembali ke halaman ini, buka B, lalu unduh PDF dengan data yang sama dan beri nama <code>B-baseline-clone.pdf</code>.</li>
+            <li>Jangan mengedit data di antara ekspor A dan B. Unggah kedua PDF untuk dibandingkan pada seluruh sembilan halaman.</li>
         </ol>
     </main>
 </body>

@@ -6,9 +6,9 @@ const path = require('node:path');
 
 const repositoryRoot = path.resolve(__dirname, '..');
 const rendererFixturePath = '/tests/fixtures/badge-visual.html';
-const fontFixturePath = '/tests/fixtures/badge-font-ab.html';
-const controlPrefix = '/badge-font-ab/control';
-const candidatePrefix = '/badge-font-ab/candidate';
+const baselineFixturePath = '/tests/fixtures/badge-baseline-ab.html';
+const controlPrefix = '/badge-baseline-ab/control';
+const candidatePrefix = '/badge-baseline-ab/candidate';
 const distRoot = path.resolve(repositoryRoot, 'dist');
 const fixtureRoot = path.resolve(repositoryRoot, 'tests', 'fixtures');
 const productionHtmlPath = path.join(distRoot, 'index.html');
@@ -32,39 +32,91 @@ const contentTypes = new Map([
     ['.woff2', 'font/woff2']
 ]);
 
-const badgeFontCandidateInjection = `
-    <!-- Eksperimen lokal A/B font badge; tidak terdapat pada dist produksi. -->
-    <link rel="preload" href="assets/fonts/plus-jakarta-sans-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <style id="badge-font-ab-candidate">
-        @font-face {
-            font-family: "Plus Jakarta Sans Badge Stable";
-            src: url("assets/fonts/plus-jakarta-sans-latin-800-normal.woff2") format("woff2");
-            font-style: normal;
-            font-weight: 800;
-            font-display: block;
-        }
-
-        .report-badge,
-        .pdf-badge {
-            font-family: "Plus Jakarta Sans Badge Stable", "Plus Jakarta Sans", sans-serif !important;
+const badgeBaselineCandidateHeadInjection = `
+    <!-- Eksperimen lokal A/B baseline badge; tidak terdapat pada dist produksi. -->
+    <style id="badge-baseline-ab-candidate">
+        .badge-export-content {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: inherit !important;
+            max-width: 100% !important;
+            line-height: inherit !important;
+            white-space: nowrap !important;
+            box-sizing: border-box !important;
+            transform: translateY(-4.5px) !important;
         }
     </style>
+`;
+
+const badgeBaselineCandidateBodyInjection = `
+    <script id="badge-baseline-ab-hook">
+        (() => {
+            const installBadgeBaselineCandidate = () => {
+                const originalHtml2Canvas = window.html2canvas;
+                if (
+                    typeof originalHtml2Canvas !== 'function'
+                    || originalHtml2Canvas.__badgeBaselineCandidate
+                ) return;
+
+                const wrappedHtml2Canvas = (element, options = {}) => {
+                    const upstreamOnclone = options.onclone;
+                    return originalHtml2Canvas(element, {
+                        ...options,
+                        onclone: async (clonedDocument, clonedElement) => {
+                            if (typeof upstreamOnclone === 'function') {
+                                await upstreamOnclone(clonedDocument, clonedElement);
+                            }
+
+                            clonedDocument
+                                .querySelectorAll('.a4-page .report-badge, .a4-page .pdf-badge')
+                                .forEach((badge) => {
+                                    const onlyElement = badge.childElementCount === 1
+                                        ? badge.firstElementChild
+                                        : null;
+                                    if (
+                                        onlyElement?.classList.contains('badge-export-content')
+                                        && badge.childNodes.length === 1
+                                    ) return;
+
+                                    const content = clonedDocument.createElement('span');
+                                    content.className = 'badge-export-content';
+                                    while (badge.firstChild) content.appendChild(badge.firstChild);
+                                    badge.appendChild(content);
+                                });
+                        }
+                    });
+                };
+
+                wrappedHtml2Canvas.__badgeBaselineCandidate = true;
+                window.html2canvas = wrappedHtml2Canvas;
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', installBadgeBaselineCandidate, { once: true });
+            } else {
+                installBadgeBaselineCandidate();
+            }
+        })();
+    <\/script>
 `;
 
 const productionHtml = fs.readFileSync(productionHtmlPath, 'utf8');
 const candidateHtml = productionHtml
     .replace(
         /<title>[^<]*<\/title>/,
-        '<title>B — Uji Font Badge Stabil | Sistem Generator Laporan MBG</title>'
+        '<title>B — Uji Baseline Badge Clone | Sistem Generator Laporan MBG</title>'
     )
-    .replace('</head>', `${badgeFontCandidateInjection}</head>`);
+    .replace('</head>', `${badgeBaselineCandidateHeadInjection}</head>`)
+    .replace('</body>', `${badgeBaselineCandidateBodyInjection}</body>`);
 
 if (
     candidateHtml === productionHtml
-    || !candidateHtml.includes('badge-font-ab-candidate')
-    || !candidateHtml.includes('<title>B — Uji Font Badge Stabil')
+    || !candidateHtml.includes('badge-baseline-ab-candidate')
+    || !candidateHtml.includes('badge-baseline-ab-hook')
+    || !candidateHtml.includes('<title>B — Uji Baseline Badge Clone')
 ) {
-    throw new Error('Gagal menyiapkan kandidat A/B font badge dari dist/index.html.');
+    throw new Error('Gagal menyiapkan kandidat A/B baseline badge dari dist/index.html.');
 }
 
 const isInside = (filePath, root) => filePath === root || filePath.startsWith(`${root}${path.sep}`);
@@ -169,7 +221,7 @@ const server = http.createServer((request, response) => {
         return;
     }
 
-    if (pathname === rendererFixturePath || pathname === fontFixturePath) {
+    if (pathname === rendererFixturePath || pathname === baselineFixturePath) {
         sendFile(request, response, path.resolve(repositoryRoot, `.${pathname}`), fixtureRoot);
         return;
     }
@@ -185,7 +237,7 @@ const server = http.createServer((request, response) => {
 
 server.listen(requestedPort, '127.0.0.1', () => {
     console.log(`A/B renderer badge: http://127.0.0.1:${requestedPort}${rendererFixturePath}`);
-    console.log(`A/B font badge produksi: http://127.0.0.1:${requestedPort}${fontFixturePath}`);
+    console.log(`A/B baseline badge produksi: http://127.0.0.1:${requestedPort}${baselineFixturePath}`);
     console.log('Tekan Ctrl+C untuk menghentikan server lokal.');
 });
 
